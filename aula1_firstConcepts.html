@@ -11,14 +11,14 @@
 		<h1>linguagens</h1>
 		<ul>
 			<li>
-				<h2>humano</h2>
-				<p>
-					<li>o uso da palavra articulada ou escrita como meio de expressão e de comunicação entre pessoas.</li>
+				<h2>Humanas</h2>
+					<ul>
+						<li>o uso da palavra articulada ou escrita como meio de expressão e de comunicação entre pessoas.</li>
 
-					<li> a forma de expressão prórpia de um indivíduo, grupo, classe, etc.</li>
+						<li> a forma de expressão prórpia de um indivíduo, grupo, classe, etc.</li>
 
-					<li>tudo quanto serve para expressar ideias, sentimentos, modos de comportamento, etc.</li>
-				</p>
+						<li>tudo quanto serve para expressar ideias, sentimentos, modos de comportamento, etc.</li>
+					</ul>
 			</li>
 			<li><p>
 				<strong>Linguagem de máquina:</strong> É o código de máquina, considerado como linguagem de programação em que instruções e dados são representados como sequências de dígitos binários.
@@ -34,7 +34,7 @@
 			</p></li>
 
 			<li><p>
-				<strong>Linguagem de programação de alto nível: Linguagem de programação cuja estrutura busca aproximar-se do raciocínio humano, e que exige o uso de compilador ou de interpretador para sua execução, facilitando o processo de programação e permitindo maior complexidade desta, se comparada à linguagem de máquina ou à linguagem assembly.</strong>
+				<strong>Linguagem de programação de alto nível:</strong> Linguagem de programação cuja estrutura busca aproximar-se do raciocínio humano, e que exige o uso de compilador ou de interpretador para sua execução, facilitando o processo de programação e permitindo maior complexidade desta, se comparada à linguagem de máquina ou à linguagem assembly.
 			</p></li>
 		</ul>
 	</div>
@@ -62,7 +62,7 @@
 	</div>
 
 	<div>
-		<h1>Compilador</h1>
+		<h1>Compiladores</h1>
 		<ul>
 			<li><p>
 				<strong>Compilador &rightarrow;</strong> é um programa que recebe como entrada um código em uma linguagem de programação - a linguagem fonte - e o traduz para um código equivalente em outra linguagem - a linguagem objeto.
@@ -83,8 +83,108 @@
 			</li>
 			<img src="assets\compilação+interpretacao.jpg" alt="compilação mais interpretação">
 		</ul>
+				<p>
+				</div>
+	<div>
+		<h1>Exemplo de diagrama de um compilador</h1>
+		<img src="assets\compilation-steps.png" alt="diagrama de um compilador">
 	</div>
-	<img src="assets\diagrama de um compilador.jpg" alt="diagrama de um compilador">
-	
+	<div>
+		<h1>Fases de um compilador</h1>
+		<ul>
+			<li><h2>
+				Análise Léxica ou scanning
+			</h2></li>
+			<li>O analisador léxico lê o fluxo de caracteres que compõem o programa fonte e os agrupa em sequências significativas, chamadas de <strong>LEXEMAS.</strong></li>
+			<li>
+				para cada lexema, o analisador léxico produz como sáida um token no formato: &lt;nome-token, valor-atributo&gt; que é passado para a fase subsequente, a analise sintática.
+				<ul>
+					<li>nome-token&LeftArrow; símbolo abstrato que é usado durante a análise sintática.</li>
+					<li>valor-atributo, aponta para uma entrada na tabela de símbolos referente a esse token.</li>
+				</ul>
+				<p>- A informação da entrada da tabela de símbolos é necessária para a análise semântica e para a geração de código.</p>
+			</li>
+
+			<li><h2>exemplo</h2></li>
+			<ul>
+				<li>suponha que um programa fonte contenha o comando de atribuição: position = initial + rate * 60</li>
+				
+				<li>position é um lexema mapeado em um token &lt;id, 1&gt;, onde <strong>id</strong> é um símbolo abstrato que significa identificador e 1 aponta para a entrada da tabela de símbolos onde se encontra position;</li>
+				
+				<li>o símbolo de atribuição = é um lexema mapeado para o token &lt;=&gt;</li>
+				
+				<li>initial é um lexema mapeado para o token &lt;id, 2&gt;</li>
+
+				<li>+ é um lexema mapeado para o token &lt;+&gt;</li>
+
+				<li>rate é um lexema mapeado para o token &lt;id, 3&gt;</li>
+
+				<li>* é um lexema mapeado para o token &lt;*&gt;</li>
+				
+				<li>60 é um lexema normalmente mapeado para o token &lt;num,60&gt;. A palavra num indica que 60 é uma constante numérica</li>
+
+				<li>a expresão encontrada seria: <br> &lt;id,1&gt; &lt;id,2&gt; &lt;+&gt; &lt;id, 3&gt; &lt;*&gt; &lt;num,60&gt;</li>
+			</ul>
+
+			<li><h2>Análise Sintática</h2></li>
+			<ul>
+				<li>O analisador sintático utiliza os primeiros componentes dos tokens produzidos pelo analisador léxico para criar uma representação intermediária tipo árvore, que mostra a estrutura gramatical da sequência de tokens.</li>
+
+				<li>uma representação típica é uma árvore de sintaxe em que cada nó interior representa uma operação e os filhos do nó representam os argumentos da operação</li>
+			</ul>
+			</li>
+
+			<li><h2>exemplo:</h2></li>
+
+			<img src="assets\analisador sintático.jpg" alt="analisador sintatico exemplo">
+			
+			<li>
+				<h2>análise semântica</h2>
+			</li>
+			<ul>
+				<li>ocorre a <strong>verificação de tipo</strong>, em que o compilador verifica se cada operador possui operandos compatíveis:</li>
+						
+				<li>exemplo: muitas linguagens de programação exigem que um índice de arranjo seja um inteiro, portanto, o compilador precisa informar um erro de tipo se um número de ponto flutuante for usado para indexar um arranjo.</li>
+
+				<li>para o exemplo trabalhado até agora tem-se:</li>
+				<img src="assets\analise-semantica.jpg" alt="analisador semantico exemplo">
+			</ul>
+				<li><h2>gerador de código intermediário</h2></li>
+			<ul>
+				<li>
+					<p>usa a estrutura produzida pelo analisador sintático para criar uma cadeia de instruções simples.</p>
+				<li>
+					<p>
+						muitos estilos de código intermediário são possíveis. um estilo comum usa instruções com um operador e um n° pequeno de operandos
+					</p>
+					<li> 
+						<p>
+							existe uma forma de representação intermediária, denominada <strong>código de três endereços</strong>, que consiste em uma sequencia de instruções do tipo assembler com no máximo três operandos por instrução.
+						</p>
+					</li>
+						<img src="assets\gerador-de-codigo-intermediario-exemplo.jpg" alt="exemplo de gerador de código intermediario">
+				</li>
+			</ul>
+		</ul>
+		<ul>
+			<li><h2>Otimização de código(fase opcional)</h2></li>
+			<ul>
+				<li>
+					Melhorar o código intermediário tal que o programa objeto seja mais rápido e/ou ocupe menos espaço. Sua saída é outro programa em código intermediário que faz a mesma tarefa do original
+				</li>
+			</ul>
+		</ul>
+		<img src="assets\exemplo-otimizacao-codigo.jpg" alt="exemplo de otimização de código">
+
+		<ul>
+			<li><h2>Gerador de código:</h2></li>
+			<ul>
+				<li>
+					gera o programa objeto. O código é gerado sempre para determinadas unidades sintáticas, sendo utilizadas informações fornecidas pelo analista de contexto.
+				</li>
+			</ul>
+		</ul>
+		<img src="assets\gerador-de-codigo-intermediario-exemplo.jpg" alt="exemplo de gerador de código intermediário">
+	</div>
 </body>
 </html>
