@@ -9,9 +9,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LeitorDeArquivosTexto {
-	private final static int TAMANHO_BUFFER = 5;
+	private final static int TAMANHO_BUFFER = 20;
 	int[] bufferDeLeitura;
 	int ponteiro;
+	int bufferAtual;
+	int inicioLexema;
+	private String lexema;
+
 	InputStream is;
 
 	public LeitorDeArquivosTexto(String arquivo){ //vai ler os caracteres e inicilizar o buffer
@@ -25,6 +29,9 @@ public class LeitorDeArquivosTexto {
 	}
 
 	private void inicializarBuffer(){
+		bufferAtual = 2;
+		inicioLexema = 0;
+		lexema = "";
 		bufferDeLeitura = new int[TAMANHO_BUFFER * 2];
 		ponteiro = 0;
 		recarregarBuffer1();
@@ -42,48 +49,97 @@ public class LeitorDeArquivosTexto {
 	}
 
 	private void recarregarBuffer1(){
-		for (int i = 0; i < TAMANHO_BUFFER; i++) {
-			try {
-				bufferDeLeitura[i] = is.read();
-				if (bufferDeLeitura[i] == -1) {
-					break;
-				}	
-			} catch (IOException ex) {
-			Logger.getLogger(LeitorDeArquivosTexto.class.getName()).log(Level.SEVERE, null, ex);
+		if (bufferAtual == 2) { 
+			bufferAtual = 1; //logica circular sem bug de carregamento duplo
+			for (int i = 0; i < TAMANHO_BUFFER; i++) {
+				try {
+					bufferDeLeitura[i] = is.read();
+					if (bufferDeLeitura[i] == -1) {
+						break;
+					}	
+				} catch (IOException ex) {
+				Logger.getLogger(LeitorDeArquivosTexto.class.getName()).log(Level.SEVERE, null, ex);
+				}
 			}
 		}
 	}
 
 	private void recarregarBuffer2(){
-		for (int i = 0; i < TAMANHO_BUFFER * 2; i++) {
-			try {
-				bufferDeLeitura[i] = is.read();
-				if (bufferDeLeitura[i] == -1) {
-					break;
-				}	
-			} catch (IOException ex) {
-			Logger.getLogger(LeitorDeArquivosTexto.class.getName()).log(Level.SEVERE, null, ex);
+		if (bufferAtual == 1) {//logica circular sem bug de carregamento duplo
+			bufferAtual = 2;
+			for (int i = 0; i < TAMANHO_BUFFER * 2; i++) {
+				try {
+					bufferDeLeitura[i] = is.read();
+					if (bufferDeLeitura[i] == -1) {
+						break;
+					}	
+				} catch (IOException ex) {
+				Logger.getLogger(LeitorDeArquivosTexto.class.getName()).log(Level.SEVERE, null, ex);
+				}
 			}
 		}
 	}
 
 	private int lerCaractereDoBuffer(){
 		int ret = bufferDeLeitura[ponteiro];
+		System.out.println(this); //kd vez q é lido 1 caracter do buffer, o mesmo é imprimido no console
 		incrementarPonteiro();
 		return ret;
 	}
 
 	public int lerProximoCaractere(){
 		int c = lerCaractereDoBuffer();
-		System.out.print((char)c);
+		lexema += (char)c;
 		return c;
 	}
 
 	public void retroceder(){
 		//serve para resetar o ponteiro
 		ponteiro--;
+		lexema = lexema.substring(0, lexema.length() - 1);
 		if (ponteiro < 0) {
 			ponteiro = TAMANHO_BUFFER * 2 - 1;
 		}
+	}
+
+	public void zerar(){ //sempre que se tentar um padrao e não conseguir, se zera o lexema
+		ponteiro = inicioLexema;
+		lexema = "";
+	}
+
+	public void confirmar(){ //confirma se um padrão é um lexema msm
+		inicioLexema = ponteiro;
+		lexema = "";
+	}
+
+	public String getLexema(){
+		return lexema;
+	}
+	
+	@Override
+	public String toString(){
+		String ret = "Buffer:[";
+		for (int i : bufferDeLeitura) {
+			char c = (char) i;
+			if (Character.isWhitespace(c)) {
+				ret += ' ';
+			} else {
+				ret += (char) i;
+			}
+		}
+		ret += "]\n";
+		ret += "	";
+		for (int i = 0; i < TAMANHO_BUFFER * 2; i++) {
+			if (i == inicioLexema && i == ponteiro) {
+				ret += "%";
+			} else if(i == inicioLexema){
+				ret += "^";
+			} else if(i == ponteiro){
+				ret += "*";
+			}else {
+				ret += " ";
+			}
+		}
+		return ret;
 	}
 }
