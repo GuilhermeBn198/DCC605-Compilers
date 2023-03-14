@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class LeitorDeArquivosTexto {
-	private final static int TAMANHO_BUFFER = 20;
+	private final static int TAMANHO_BUFFER = 5;
 	int[] bufferDeLeitura;
 	int ponteiro;
 	int bufferAtual;

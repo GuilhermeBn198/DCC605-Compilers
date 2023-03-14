@@ -5,8 +5,8 @@ public class Anallex {
 		AlgumaLexico lex = new AlgumaLexico(args[0]);
 		Token t = null;
 
-		while ((t = lex.proximoToken()).nome != TipoToken.Fim) {
-			System.out.println(t);
+		while ((t = lex.proximoToken()) != null) {
+			System.out.print(t);
 		}
 	}
 }

@@ -11,87 +11,87 @@ public class AlgumaLexico {
 	}
 
 	public Token proximoToken() {
-		Token proximo = null;
-
-		espacosEComentarios();
-		ldat.confirmar();
-
-		proximo = fim();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
+		Token proximo = null;			
+			espacosEComentarios();
 			ldat.confirmar();
-			return proximo;
+		
+			proximo = fim();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			proximo = palavrasChave();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			proximo = variavel();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			proximo = numeros();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			proximo = operadorAritmetico();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			proximo = operadorRelacional();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			proximo = delimitador();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			proximo = parenteses();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			proximo = cadeia();
+			if (proximo == null) {
+				ldat.zerar();
+			} else {
+				ldat.confirmar();
+				return proximo;
+			}
+		
+			System.err.println("erro léxico");
+			System.err.println(ldat.toString());
+
+			return null;
 		}
-
-		proximo = palavrasChave();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
-			ldat.confirmar();
-			return proximo;
-		}
-
-		proximo = variavel();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
-			ldat.confirmar();
-			return proximo;
-		}
-
-		proximo = numeros();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
-			ldat.confirmar();
-			return proximo;
-		}
-
-		proximo = operadorAritmetico();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
-			ldat.confirmar();
-			return proximo;
-		}
-
-		proximo = operadorRelacional();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
-			ldat.confirmar();
-			return proximo;
-		}
-
-		proximo = delimitador();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
-			ldat.confirmar();
-			return proximo;
-		}
-
-		proximo = parenteses();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
-			ldat.confirmar();
-			return proximo;
-		}
-
-		proximo = cadeia();
-		if (proximo == null) {
-			ldat.zerar();
-		} else {
-			ldat.confirmar();
-			return proximo;
-		}
-
-		System.err.println("erro léxico");
-		System.err.println(ldat.toString());
-
-		return null;
 
 		// int caractereLido = -1; //implementação antiga
 
@@ -108,7 +108,6 @@ public class AlgumaLexico {
 		// //caracteres lógicos
 
 		// }
-	}
 
 	private Token operadorAritmetico() {
 		int caractereLido = ldat.lerProximoCaractere();
