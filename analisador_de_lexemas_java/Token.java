@@ -1,4 +1,4 @@
-package analisador_de_lexemas;
+package analisador_de_lexemas_java;
 
 public class Token {
 	public TipoToken nome;

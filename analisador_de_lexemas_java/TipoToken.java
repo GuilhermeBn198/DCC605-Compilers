@@ -1,4 +1,4 @@
-package analisador_de_lexemas;
+package analisador_de_lexemas_java;
 
 public enum TipoToken {
 	PCDeclaracoes, PCAlgoritmo, PCReal, PCInteiro, PCAtribuir, PCA, PCLer, PCimprimir, PCSe, PCEntao, PCEnquanto, PCInicio, PCFim, 

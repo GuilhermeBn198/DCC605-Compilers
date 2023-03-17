@@ -1,4 +1,4 @@
-package analisador_de_lexemas;
+package analisador_de_lexemas_java;
 
 import java.io.File;
 import java.io.FileInputStream;
