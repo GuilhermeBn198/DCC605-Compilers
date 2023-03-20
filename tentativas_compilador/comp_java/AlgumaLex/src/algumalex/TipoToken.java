@@ -16,4 +16,4 @@ public enum TipoToken {
     OpRelMaior, OpRelIgual, OpRelDif,
     OpBoolE, OpBoolOu,
     Delim, AbrePar, FechaPar, Var, NumInt, NumReal, Cadeia, Fim
-}
+} //enum para identificar os tipos de Tokens

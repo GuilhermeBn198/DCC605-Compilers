@@ -7,7 +7,9 @@ fatorial:INT
 LER argumento
 ATRIBUIR argumento A fatorial
 SE argumento = 0 ENTAO ATRIBUIR 1 A fatorial
-ENQUANTO argumento > 1
+
+ENQUANTO argumento < 1000
+
    INICIO
       ATRIBUIR fatorial * (argumento - 1) A fatorial
       ATRIBUIR argumento - 1 A argumento
