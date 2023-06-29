@@ -189,7 +189,7 @@ int AutomatoIdentifier (char *str){
     /* Definindo o estado inicial */
     int e = 0;
 
-    /* Recebera a indexacao referente ao caractere*/
+    /* Recebe a indexacao referente ao caractere*/
     int c;
 
     /* Percorrendo toda a sentenca de avaliacao*/
@@ -315,18 +315,18 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
 
             if (isDelimiter(token[right]) == true && left == right) {
                 if (isOperator(token[right]) == true){
-                    //cout << token[right] << " IS AN OPERATOR" << endl;
+                    cout << token[right] << " IS AN OPERATOR" << endl; //
                     char tokenCH[2];tokenCH[0]=token[right];tokenCH[1]='\0';
                     l = lst_insere(l, tokenCH, 1, line);
                 }
                 else if(isDelimiterChar(token[right]) == true){
-                    //if(token[right]==';')
-                        //cout << token[right] << endl<<endl<<endl;
+                    if(token[right]==';') //
+                        cout << token[right] << endl<<endl<<endl; //
                     char tokenCH[2];tokenCH[0]=token[right];tokenCH[1]='\0';
                     l = lst_insere(l, tokenCH, 6, line);
                 }
                 else if(isDelimiterfinal(token[right]) == true){
-                    //cout << token[right] << endl<<endl<<endl;
+                    cout << token[right] << endl<<endl<<endl; //
                     char tokenCH[2];tokenCH[0]=token[right];tokenCH[1]='\0';
                     l = lst_insere(l, tokenCH, 7, line);
                 }
@@ -336,15 +336,15 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
             else if (isDelimiter(token[right]) == true && left != right || (right == len && left != right)) {
                 char* subStr = subString(token, left, right - 1);
                 if (isKeyword(subStr) == true){
-                    //cout << subStr<< " IS A KEYWORD" << endl;
+                    cout << subStr<< " IS A KEYWORD" << endl; //
                     l = lst_insere(l, subStr, 2, line);
                 }
                 else if (AutomatoInteger(subStr) == true){
-                    //cout << subStr << " IS AN INTEGER" << endl;
+                    cout << subStr << " IS AN INTEGER" << endl; //
                     l = lst_insere(l, subStr, 3, line);
                 }
                 else if (AutomatoFloat(subStr) == true){
-                    //cout << subStr << " IS A float NUMBER" << endl;
+                    cout << subStr << " IS A float NUMBER" << endl; //
                     l = lst_insere(l, subStr, 4, line);
                 }
                 else if (AutomatoIdentifier(subStr) == true && isDelimiter(token[right - 1]) == false){
@@ -360,7 +360,7 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
                         error=1;
                         break;
                     }
-                    //cout << subStr << " IS A VALID IDENTIFIER" << endl;
+                    cout << subStr << " IS A VALID IDENTIFIER" << endl; //
                     l = lst_insere(l, subStr, 5, line);
                 }
                 //esta sendo carregado algum caractere oculto pela interface causando mal funcionamento desta parte
@@ -1068,7 +1068,7 @@ int AutomatoM(char *str, char *str2, int line){
                     {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'},
                     {'R', 'R', 'R', 'R', '\0', 'R', '\0', 'R'}, {'R', 'R', 'R', 'R', '\0', 'R', '\0', 'R'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}};
 
-    int QLinhasProducoes=10;
+    const int QLinhasProducoes = 10;
     char producoes[QLinhasProducoes][6]={{"E;E+S"},{"E;S"},{"S;S-M"},{"S;M"},{"M;M*D"},{"M;D"},{"D;D/P"},{"D;P"},{"P;(E)"},{"P;v"}};
 
     /*Declarando a pilha*/
@@ -1078,9 +1078,9 @@ int AutomatoM(char *str, char *str2, int line){
     /* Colocando o simbolo delimitador na pilha*/
     pilha.push('$');
 
-    /* Recebera a indexa��o referente ao matriz*/
+    /* Recebe a indexacao referente ao matriz*/
     int c,l,i;
-    /* Recebera as produ��es*/
+    /* Recebe as producoes*/
     char Prod[4];
 
     int parentese=0;
@@ -1189,12 +1189,12 @@ int AutomatoM(char *str, char *str2, int line){
                     return 0;
             }
 
-            /* Escolhendo a produ��o a ser aplicada pela tabela sint�tica */
+            /* Escolhendo a producao a ser aplicada pela tabela sintatica */
 
-            char Nprod = M[l][c];
+            char Nprod = M[l][c];  //l = topo da stack, c = caractere atual do input string
             int producoes_compativeis[2];
 
-            /* Fazendo equival�ncia entre a produ��o e ordem inversa e o seu n�mero da tabela */
+            /* Fazendo equivalencia entre a producao e ordem inversa e o seu numero da tabela */
             switch(Nprod){
                 case 'D':
                     pilha.push(str[i]);
@@ -1266,10 +1266,10 @@ int AutomatoM(char *str, char *str2, int line){
                     return 0;
             }
 
-            /* Verificando se h� o sentencial no topo da pilha e se o delimitador � o caractere em analise*/
+            /* Verificando se ha o sentencial no topo da pilha e se o delimitador eh o caractere em analise*/
             if(pilha.top()=='E' && str[i]=='$')
                 return 1;
-            /* Mudan�a de estado do aut�mato */
+            /* Mudanca de estado do automato */
             else
                 break;
 
@@ -1294,7 +1294,7 @@ int erroSyntax=0;
 
 stack<char>pilha_atribuicao;
 
-int analise_sintatica(Lista* l){
+void analise_sintatica(Lista* l){ //era uma int function
     Lista* p;
     p=l;
     q1=quadrupla_cria();
