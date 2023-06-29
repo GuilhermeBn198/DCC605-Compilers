@@ -245,6 +245,7 @@ int AutomatoIdentifier (char *str){
         return 0;
 }
 
+//This function checks if a given character is a final delimiter. In this case, the function returns true if the character is a semicolon (';'), and false otherwise.
 bool isDelimiterfinal(char ch){
     if (ch == ';')
         return (true);
@@ -260,6 +261,7 @@ bool isDelimiter(char ch){
     return (false);
 }
 
+// This function checks if a given character is a character delimiter. It returns true if the character is a comma, parenthesis, single quote, or double quote. It returns false otherwise.
 bool isDelimiterChar(char ch){
     if (ch == ',' || ch == '(' || ch == ')' ||
         ch == '\'' || ch == '"')
@@ -278,12 +280,21 @@ bool isOperator(char ch){
 Lista* separateAndAnalyze(char *parse, Lista* l, int line);
 char* subString(char* str, int left, int right);
 
+
 Lista* analise_lexica(char *iParse, int len, Lista* l, int line){
-    char parse[len];
-    strcpy(parse,iParse);
+    char* parse = new char[len+1]; // Allocate memory dynamically
+    strcpy(parse, iParse);
     l = separateAndAnalyze(parse, l, line);
+    delete[] parse;  // Free the allocated memory
     return l;
 }
+
+// Lista* analise_lexica(char *iParse, int len, Lista* l, int line){  //implementação antiga - sem alloc dinamico
+//     char parse[len];
+//     strcpy(parse,iParse);
+//     l = separateAndAnalyze(parse, l, line);
+//     return l;
+// }
 
 Lista* separateAndAnalyze(char *parse, Lista* l, int line){
     int left, right, len, buffer=0,temPontoEVirgula=0;
@@ -444,10 +455,12 @@ ArvS* arv_criaS(void){
 
 Nodo* arv_busca_no(Nodo* raiz, char *info);
 
+//This function is a wrapper function for arv_busca_no. It starts the search from the root of the syntax tree.
 Nodo* arv_busca(Arv* arv, char *info){
     return arv_busca_no(arv->raiz, info);
 }
 
+//This is a recursive function that searches for a node in the syntax tree that has a matching info and at least one NULL child (either esq, center, or dir). It performs a depth-first search, first checking the current node (raiz), then recursively checking the esq, center, and dir children. If it finds a matching node, it returns a pointer to that node. If it doesn't find a match, it returns NULL.
 Nodo* arv_busca_no(Nodo* raiz, char *info){
     if(raiz==NULL){
         return raiz;
@@ -465,7 +478,7 @@ Nodo* arv_busca_no(Nodo* raiz, char *info){
     return no;
 }
 
-//fun��o para corrigir ambiguidade do E;E+S, M;S-M, M;M*D, D;D/P, P;(E)
+//funcao para corrigir ambiguidade do E;E+S, M;S-M, M;M*D, D;D/P, P;(E)
 void check_lower(Nodo *raiz, Nodo *raiz2, char *info, char *info2){
     if(raiz==NULL || strcmp(raiz->info, "+")==0 || strcmp(raiz->info, "-")==0 || strcmp(raiz->info, "*")==0 || strcmp(raiz->info, "-")==0 ||
        strcmp(raiz->info, "(")==0 || strcmp(raiz->info, ")")==0 || strcmp(raiz->info, "v")==0 || strcmp(raiz->info, "&")==0 || blockWeakTree)
@@ -917,6 +930,8 @@ void check_lowerS(NodoS* raiz, NodoS* raiz2){
     check_lowerS(raiz->dir, raiz2->dir);
 }
 
+
+//This function is used to construct a tree for 'S' (denoted by arvS). It takes as input two nodes (raiz and raiz2). The function checks several conditions (if the root is NULL or if the root's information is 'v' or if the blockWeakTreeS flag is set). It then fills the left and right nodes of the tree using the top elements of two stacks (pilha_gen_arvS and pilha_gen_arvS_exp). If any of the left or right child nodes of the root contain an operator ('+', '-', '*', '/'), it calls the check_lowerS function on these child nodes. The function recursively calls itself to construct the tree for all nodes.
 void constroi_arvS(NodoS* raiz, NodoS* raiz2){
     if(raiz==NULL || strcmp(raiz->info, "v")==0 || blockWeakTreeS)
         return;
@@ -963,6 +978,7 @@ void constroi_arvS(NodoS* raiz, NodoS* raiz2){
     constroi_arvS(raiz->dir, raiz2->dir);
 }
 
+//This function simplifies a weak tree. It takes as input four trees (arv, arv2, arvS, arvS2). It creates a stack from the root nodes of the first two trees. If the root of arvS is NULL, it creates a new root node using the top element of the stack pilha_gen_arvS and does the same for arvS2 using the top element of the stack pilha_gen_arvS_exp. It then constructs the arvS and arvS2 trees using the constroi_arvS function until the pilha_gen_arvS stack is empty.
 void simplifica_arvore_fraca(Arv* arv, Arv* arv2, ArvS* arvS, ArvS* arvS2){
     cria_pilha_gen(arv->raiz, arv2->raiz);
     char info[2];
@@ -987,11 +1003,13 @@ void simplifica_arvore_fraca(Arv* arv, Arv* arv2, ArvS* arvS, ArvS* arvS2){
 
 void arv_imprime_no(Nodo* raiz);
 
-void arv_imprime(Arv* arv){
+//This function prints a tree. It calls the arv_imprime_no function to print the root node of the tree.
+void arv_imprime(Arv* arv){ 
     return arv_imprime_no(arv->raiz);
 }
 
-void arv_imprime_no(Nodo* raiz){
+//This function prints a node of a tree in a recursive manner. If the node is not NULL and its information is not '&', it first prints the node's information, then recursively prints the left, center, and right children of the node.
+void arv_imprime_no(Nodo* raiz){ 
 	printf("<");
 	if(raiz!=NULL && raiz->info[0]!='&'){
         printf("%s",raiz->info);
@@ -1002,6 +1020,7 @@ void arv_imprime_no(Nodo* raiz){
 	printf(">");
 }
 
+//This function prints a node of a tree 'S'. If the node is not NULL, it prints the node's information, then recursively prints the left and right children of the node.
 void arv_imprime_noS(NodoS* raiz){
 	printf("<");
 	if(raiz!=NULL){
@@ -1012,8 +1031,10 @@ void arv_imprime_noS(NodoS* raiz){
 	printf(">");
 }
 
+// This function frees the memory allocated to a node of a tree. If the node is not NULL, it recursively frees the left, center, and right children of the node, then frees the node itself.
 void liberar_avr_no(Nodo* raiz);
 
+//This function frees the memory allocated to a tree. It first frees the root node of the tree using the liberar_avr_no function, then frees the tree itself.
 void liberar_avr(Arv* arv){
     liberar_avr_no(arv->raiz);
     free(arv);
@@ -1028,6 +1049,7 @@ void liberar_avr_no(Nodo* raiz){
     }
 }
 
+//This function frees the memory allocated to a node of a tree 'S'. If the node is not NULL, it recursively frees the left and right children of the node, then frees the node itself.
 void liberar_avr_noS(NodoS* raiz){
     if(raiz!=NULL){
         liberar_avr_noS(raiz->esq);
