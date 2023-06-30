@@ -289,7 +289,7 @@ Lista* analise_lexica(char *iParse, int len, Lista* l, int line){
     return l;
 }
 
-// Lista* analise_lexica(char *iParse, int len, Lista* l, int line){  //implementação antiga - sem alloc dinamico
+// Lista* analise_lexica(char *iParse, int len, Lista* l, int line){  //implementacao antiga - sem alloc dinamico
 //     char parse[len];
 //     strcpy(parse,iParse);
 //     l = separateAndAnalyze(parse, l, line);
@@ -1792,109 +1792,68 @@ void gera_mips2(Quadrupla *q){
 }
 
 //interface
-LRESULT CALLBACK WindowProcedure(HWND,UINT,WPARAM,LPARAM);
+#include <fstream>
+#include <iostream>
+#include <vector>
+#include <string>
 
-void AddControls(HWND);
 
-HWND hMainWindow,hEdit, hQuadrupla, hCod_inter, hCod_inter_otimi;
-
-//main
-int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR atgs, int ncmdshow){
-
-    WNDCLASSW wc = {0};
-
-    wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-    wc.hCursor = LoadCursor(NULL,IDC_ARROW);
-    wc.hInstance = hInst;
-    wc.lpszClassName = L"myWindowClass";
-    wc.lpfnWndProc = WindowProcedure;
-
-    if(!RegisterClassW(&wc))
-        return -1;
-
-    hMainWindow = CreateWindowW(L"myWindowClass",L"Compilador",WS_OVERLAPPEDWINDOW | WS_VISIBLE,100,100,1060,500,NULL,NULL,NULL,NULL);
-
-    MSG msg = {0};
-
-    while(GetMessage(&msg,NULL,NULL,NULL)){
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+// This function reads from a file and returns its content as a string.
+std::string readFile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Nao foi possivel abrir o arquivo: " << filename << std::endl;
+        return "";
     }
 
-    return 0;
+    std::string content((std::istreambuf_iterator<char>(file)),
+                        (std::istreambuf_iterator<char>()));
+    return content;
 }
 
-void display_file(char *path){
-    FILE *file;
-    file = fopen(path,"rb");
-    fseek(file,0,SEEK_END);
-    int _size = ftell(file);
-    rewind(file);
-    char *data = new char[_size+1];
-    fread(data,_size,1,file);
-    data[_size] = '\0';
-    SetWindowText(hEdit,data);
+void write_file(const std::string& path, const std::string& data){
+    // Open the file in write mode.
+    std::ofstream file(path, std::ios::out);
 
+    // Check if the file was opened successfully.
+    if (!file) {
+        std::cerr << "Unable to open file";
+        return;
+    }
 
-    fclose(file);
+    // Write the data to the file.
+    file.write(data.c_str(), data.size());
+
+    // Close the file.
+    file.close();
 }
 
-void open_file(HWND hWnd){
-    OPENFILENAME ofn;
+void save_file(const std::string& data){
+    std::string filename;
+    std::cout << "Enter the filename to save: ";
+    std::cin >> filename;
 
-    char file_name[200];
+    // Open the file in write mode.
+    std::ofstream file(filename, std::ios::out);
 
-    ZeroMemory(&ofn,sizeof(OPENFILENAME));
+    // Check if the file was opened successfully.
+    if (!file) {
+        std::cerr << "Unable to open file";
+        return;
+    }
 
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = hWnd;
-    ofn.lpstrFile = file_name;
-    ofn.lpstrFile[0] = '\0';
-    ofn.nMaxFile = 200;
-    ofn.lpstrFilter = "All files\0*.*\0Source Files\0*.CPP\0Text Files\0*.TXT\0";
-    ofn.nFilterIndex = 1;
+    // Write the data to the file.
+    file.write(data.c_str(), data.size());
 
-    GetOpenFileName(&ofn);
-
-    //MessageBox(NULL,ofn.lpstrFile,"",MB_OK); //mostra o caminho do arquivo
-
-    display_file(ofn.lpstrFile);
+    // Close the file.
+    file.close();
 }
 
-void write_file(char *path){
-    FILE *file;
-    file = fopen(path,"w");
-
-    int _size = GetWindowTextLength(hEdit);
-    char *data = new char[_size+1];
-    GetWindowText(hEdit,data,_size+1);
-
-    fwrite(data,_size+1,1,file);
-
-    fclose(file);
+void espaco(){
+    std::cout << "\n\n";
 }
 
-void save_file(HWND hWnd){
-    OPENFILENAME ofn;
-
-    char file_name[100];
-
-    ZeroMemory(&ofn,sizeof(OPENFILENAME));
-
-    ofn.lStructSize = sizeof(OPENFILENAME);
-    ofn.hwndOwner = hWnd;
-    ofn.lpstrFile = file_name;
-    ofn.lpstrFile[0] = '\0';
-    ofn.nMaxFile = 100;
-    ofn.lpstrFilter = "All files\0*.*\0Source Files\0*.CPP\0Text Files\0*.TXT\0";
-    ofn.nFilterIndex = 1;
-
-    GetSaveFileName(&ofn);
-
-    write_file(ofn.lpstrFile);
-}
-
-void compilar(HWND hWnd){
+void compilar(){
     Lista* l;
     l=lst_cria();
 
@@ -1902,142 +1861,298 @@ void compilar(HWND hWnd){
     p = fopen("saida.txt", "w");
     fprintf(p,".data\n\n");
     fclose(p);
-
-    int _size = GetWindowTextLength(hEdit);
-    char *data = new char[_size+1];
-    GetWindowText(hEdit,data,_size+1);
-    //cout << data << endl << endl;
-    char exp[100];
-    int i=0,i2=0,numLinha=0;
-    while(i<_size){
-        exp[i2]=data[i];
-        i++;
-        i2++;
-        if(data[i-1]==';'){
-            exp[i2]='\0';
-            l=analise_lexica(exp,100,l,numLinha);
-            exp[0]='\0';
-            i2=0;
-        }
-        if(data[i]=='\n')
-            numLinha++;
-    }
-
-    Lista* l2;
-    l2=lst_cria();
-
-    if(error==0){
-        l2=lst_cpy_inver(l2,l);
-        analise_sintatica(l2);
-    }
-    lst_libera(l);
-    if(error==0){
-        var_declara=lst_cria();
-        var_declara=lst_cpy_var(var_declara,l2);
-        checa_var_declara(l2);
-        lst_libera(var_declara);
-        if(error==1)
-            quadrupla_libera(q2);
-
-    }
-    lst_libera(l2);
-    if(error==0){
-        gera_mips2(q2);
-        int i=0;
-        char quadruplaCharArr[quadruplaSTR.length()];
-        while(i<quadruplaSTR.length()){
-            quadruplaCharArr[i]=quadruplaSTR[i];
-            i++;
-        }
-        quadruplaCharArr[i]='\0';
-        SetWindowText(hQuadrupla,quadruplaCharArr);
-        i=0;
-        char cod_intermediario_arr[cod_intermediarioSTR.length()];
-        while(i<cod_intermediarioSTR.length()){
-            cod_intermediario_arr[i]=cod_intermediarioSTR[i];
-            i++;
-        }
-        cod_intermediario_arr[i]='\0';
-        SetWindowText(hCod_inter, cod_intermediario_arr);
-        i=0;
-        char cod_intermediario_otimi_arr[cod_intermediario_otimiSTR.length()];
-        while(i<cod_intermediario_otimiSTR.length()){
-            cod_intermediario_otimi_arr[i]=cod_intermediario_otimiSTR[i];
-            i++;
-        }
-        cod_intermediario_otimi_arr[i]='\0';
-        SetWindowText(hCod_inter_otimi, cod_intermediario_otimi_arr);
-        quadrupla_libera(q2);
-    }
-    if(error==1 || error==2){
-        error=0;
-        wchar_t wtext[201];
-        if(erroSyntax<2){
-            SetWindowText(hQuadrupla, "");
-            SetWindowText(hCod_inter, "");
-            SetWindowText(hCod_inter_otimi, "");
-
-            mbstowcs(wtext, erroMsg, strlen(erroMsg)+1);
-            LPWSTR ptr = wtext;
-            MessageBoxW(hWnd,ptr,L"Erro!", MB_OK | MB_ICONEXCLAMATION);
-        }
-        cout << erroMsg << endl;
-        strcpy(erroMsg,"");
-        while(!pilha_arvore.empty()){
-            pilha_arvore.pop();
-            pilha_arvore_exp.pop();
-        }
-        while(!pilha_gen_arvS.empty()){
-            pilha_gen_arvS.pop();
-            pilha_gen_arvS_exp.pop();
-        }
-        if(erroSyntax<2 && erroSyntax>0)
-            compilar(hWnd);
-        else
-            erroSyntax=0;
-    }
 }
 
-LRESULT CALLBACK WindowProcedure(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
-    switch(msg)
-    {
-    case WM_COMMAND:
-        {
-            switch(wp)
-            {
-            case OPEN_FILE_BUTTON:
-                open_file(hWnd);
-                break;
-            case SAVE_FILE_BUTTON:
-                save_file(hWnd);
-                break;
-            case COMPILE_BUTTON:
-                compilar(hWnd);
-                break;
+int main() {
+    int option;
+    std::string filename;
+    std::cout << "\t\tbem vindo ao compilador do Guilherme Bernardo";
+    espaco();
+    std::cout << "ele eh capaz de aceitar operacoes basicas de aritmetica como + - * /. Tambem suporta o uso de ( e )\n";
+    std::cout << "suas limitacoes sao devidas a um problema na identificacao do automato envolvendo floats, que apesar de acertar mais numeros depois da virgula, so ira apresentar um no output\n";
+    std::cout << "ha tambem uma limitacao no uso de variaveis, que so pode conter 1 caractere";
+    espaco();
+    espaco();
+    std::cout << "Selecione uma opcao:\n";
+    std::cout << "1. Ler arquivo\n";
+    std::cout << "2. fechar aplicacao\n";
+    std::cin >> option;
+
+    switch(option) {
+        case 1:{
+                espaco();
+                std::cout << "digite o nome do arquivo presente no diretorio: ";
+                std::cin >> filename;
+                std::string fileContent = readFile(filename); //faz a leitura do arquivo selecionado
+                if (fileContent == "") return 1; // encerra aplicação com o erro de abertura de arquivo
+                espaco();
+                espaco();
+                int optionvisualizacao;
+                std::cout << "Selecione uma opcao:\n"; //verifica se quer apenas visualizar o conteudo do arquivo
+                std::cout << "1. visualizar conteudo do arquivo\n";
+                std::cout << "2. fechar aplicacao\n";
+                std::cin >> optionvisualizacao;
+                espaco();
+                switch (optionvisualizacao){
+                case 1: {
+                        std::cout << fileContent << std::endl; // Print the file content on the screen
+                        espaco();
+
+                        std::cout << "começando agora a compilação do arquivo";
+                        break;
+                    }
+                    case 2:
+                        std::cout << "encerrando aplicacao.\n";
+                        return 0;
+                default:
+                    std::cout << "opcao invalida.\n";
+                    return 1;
+                }
+                return 1;
             }
-        }
-        break;
-    case WM_CREATE:
-        AddControls(hWnd);
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        break;
-    default:
-        return DefWindowProcW(hWnd,msg,wp,lp);
+        case 2:
+            std::cout << "encerrando aplicacao.\n";
+            return 0;
+        default:
+            std::cout << "opcao invalida.\n";
+            return 1;
     }
+
+    return 0;
 }
 
-void AddControls(HWND hWnd){
-    CreateWindowW(L"button",L"Abrir arquivo:", WS_VISIBLE | WS_CHILD,115,10,250,36,hWnd,(HMENU)OPEN_FILE_BUTTON,NULL,NULL);
-    CreateWindowW(L"button",L"Salvar:", WS_VISIBLE | WS_CHILD,375,10,250,36,hWnd,(HMENU)SAVE_FILE_BUTTON,NULL,NULL);
-    CreateWindowW(L"button",L"Compilar:", WS_VISIBLE | WS_CHILD,635,10,250,36,hWnd,(HMENU)COMPILE_BUTTON,NULL,NULL);
-    hEdit = CreateWindowW(L"Edit",L"Insira o codigo aqui",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
-                  10,50,250,300,hWnd,NULL,NULL,NULL);
-    hQuadrupla = CreateWindowW(L"Edit",L"Quadruplas",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
-                  270,50,250,300,hWnd,NULL,NULL,NULL);
-    hCod_inter = CreateWindowW(L"Edit",L"Codigo Intermediario",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
-                  530,50,250,300,hWnd,NULL,NULL,NULL);
-    hCod_inter_otimi = CreateWindowW(L"Edit",L"Codigo Intermediario otimizado",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
-                  790,50,250,300,hWnd,NULL,NULL,NULL);
-}
+// //interface
+// LRESULT CALLBACK WindowProcedure(HWND,UINT,WPARAM,LPARAM);
+
+// void AddControls(HWND);
+
+// HWND hMainWindow,hEdit, hQuadrupla, hCod_inter, hCod_inter_otimi;
+
+// //main
+// int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR atgs, int ncmdshow){
+
+//     WNDCLASSW wc = {0};
+
+//     wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
+//     wc.hCursor = LoadCursor(NULL,IDC_ARROW);
+//     wc.hInstance = hInst;
+//     wc.lpszClassName = L"myWindowClass";
+//     wc.lpfnWndProc = WindowProcedure;
+
+//     if(!RegisterClassW(&wc))
+//         return -1;
+
+//     hMainWindow = CreateWindowW(L"myWindowClass",L"Compilador",WS_OVERLAPPEDWINDOW | WS_VISIBLE,100,100,1060,500,NULL,NULL,NULL,NULL);
+
+//     MSG msg = {0};
+
+//     while(GetMessage(&msg,NULL,NULL,NULL)){
+//         TranslateMessage(&msg);
+//         DispatchMessage(&msg);
+//     }
+
+//     return 0;
+// }
+
+// void open_file(HWND hWnd){
+//     OPENFILENAME ofn;
+
+//     char file_name[200];
+
+//     ZeroMemory(&ofn,sizeof(OPENFILENAME));
+
+//     ofn.lStructSize = sizeof(OPENFILENAME);
+//     ofn.hwndOwner = hWnd;
+//     ofn.lpstrFile = file_name;
+//     ofn.lpstrFile[0] = '\0';
+//     ofn.nMaxFile = 200;
+//     ofn.lpstrFilter = "All files\0*.*\0Source Files\0*.CPP\0Text Files\0*.TXT\0";
+//     ofn.nFilterIndex = 1;
+
+//     GetOpenFileName(&ofn);
+
+//     //MessageBox(NULL,ofn.lpstrFile,"",MB_OK); //mostra o caminho do arquivo
+
+//     display_file(ofn.lpstrFile);
+// }
+
+// void write_file(char *path){
+//     FILE *file;
+//     file = fopen(path,"w");
+
+//     int _size = GetWindowTextLength(hEdit);
+//     char *data = new char[_size+1];
+//     GetWindowText(hEdit,data,_size+1);
+
+//     fwrite(data,_size+1,1,file);
+
+//     fclose(file);
+// }
+
+// void save_file(HWND hWnd){
+//     OPENFILENAME ofn;
+
+//     char file_name[100];
+
+//     ZeroMemory(&ofn,sizeof(OPENFILENAME));
+
+//     ofn.lStructSize = sizeof(OPENFILENAME);
+//     ofn.hwndOwner = hWnd;
+//     ofn.lpstrFile = file_name;
+//     ofn.lpstrFile[0] = '\0';
+//     ofn.nMaxFile = 100;
+//     ofn.lpstrFilter = "All files\0*.*\0Source Files\0*.CPP\0Text Files\0*.TXT\0";
+//     ofn.nFilterIndex = 1;
+
+//     GetSaveFileName(&ofn);
+
+//     write_file(ofn.lpstrFile);
+// }
+
+// void compilar(HWND hWnd){
+//     Lista* l;
+//     l=lst_cria();
+
+//     FILE *p;
+//     p = fopen("saida.txt", "w");
+//     fprintf(p,".data\n\n");
+//     fclose(p);
+
+//     int _size = GetWindowTextLength(hEdit);
+//     char *data = new char[_size+1];
+//     GetWindowText(hEdit,data,_size+1);
+//     //cout << data << endl << endl;
+//     char exp[100];
+//     int i=0,i2=0,numLinha=0;
+//     while(i<_size){
+//         exp[i2]=data[i];
+//         i++;
+//         i2++;
+//         if(data[i-1]==';'){
+//             exp[i2]='\0';
+//             l=analise_lexica(exp,100,l,numLinha);
+//             exp[0]='\0';
+//             i2=0;
+//         }
+//         if(data[i]=='\n')
+//             numLinha++;
+//     }
+
+//     Lista* l2;
+//     l2=lst_cria();
+
+//     if(error==0){
+//         l2=lst_cpy_inver(l2,l);
+//         analise_sintatica(l2);
+//     }
+//     lst_libera(l);
+//     if(error==0){
+//         var_declara=lst_cria();
+//         var_declara=lst_cpy_var(var_declara,l2);
+//         checa_var_declara(l2);
+//         lst_libera(var_declara);
+//         if(error==1)
+//             quadrupla_libera(q2);
+
+//     }
+//     lst_libera(l2);
+//     if(error==0){
+//         gera_mips2(q2);
+//         int i=0;
+//         char quadruplaCharArr[quadruplaSTR.length()];
+//         while(i<quadruplaSTR.length()){
+//             quadruplaCharArr[i]=quadruplaSTR[i];
+//             i++;
+//         }
+//         quadruplaCharArr[i]='\0';
+//         SetWindowText(hQuadrupla,quadruplaCharArr);
+//         i=0;
+//         char cod_intermediario_arr[cod_intermediarioSTR.length()];
+//         while(i<cod_intermediarioSTR.length()){
+//             cod_intermediario_arr[i]=cod_intermediarioSTR[i];
+//             i++;
+//         }
+//         cod_intermediario_arr[i]='\0';
+//         SetWindowText(hCod_inter, cod_intermediario_arr);
+//         i=0;
+//         char cod_intermediario_otimi_arr[cod_intermediario_otimiSTR.length()];
+//         while(i<cod_intermediario_otimiSTR.length()){
+//             cod_intermediario_otimi_arr[i]=cod_intermediario_otimiSTR[i];
+//             i++;
+//         }
+//         cod_intermediario_otimi_arr[i]='\0';
+//         SetWindowText(hCod_inter_otimi, cod_intermediario_otimi_arr);
+//         quadrupla_libera(q2);
+//     }
+//     if(error==1 || error==2){
+//         error=0;
+//         wchar_t wtext[201];
+//         if(erroSyntax<2){
+//             SetWindowText(hQuadrupla, "");
+//             SetWindowText(hCod_inter, "");
+//             SetWindowText(hCod_inter_otimi, "");
+
+//             mbstowcs(wtext, erroMsg, strlen(erroMsg)+1);
+//             LPWSTR ptr = wtext;
+//             MessageBoxW(hWnd,ptr,L"Erro!", MB_OK | MB_ICONEXCLAMATION);
+//         }
+//         cout << erroMsg << endl;
+//         strcpy(erroMsg,"");
+//         while(!pilha_arvore.empty()){
+//             pilha_arvore.pop();
+//             pilha_arvore_exp.pop();
+//         }
+//         while(!pilha_gen_arvS.empty()){
+//             pilha_gen_arvS.pop();
+//             pilha_gen_arvS_exp.pop();
+//         }
+//         if(erroSyntax<2 && erroSyntax>0)
+//             compilar(hWnd);
+//         else
+//             erroSyntax=0;
+//     }
+// }
+
+// LRESULT CALLBACK WindowProcedure(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
+//     switch(msg)
+//     {
+//     case WM_COMMAND:
+//         {
+//             switch(wp)
+//             {
+//             case OPEN_FILE_BUTTON:
+//                 open_file(hWnd);
+//                 break;
+//             case SAVE_FILE_BUTTON:
+//                 save_file(hWnd);
+//                 break;
+//             case COMPILE_BUTTON:
+//                 compilar(hWnd);
+//                 break;
+//             }
+//         }
+//         break;
+//     case WM_CREATE:
+//         AddControls(hWnd);
+//         break;
+//     case WM_DESTROY:
+//         PostQuitMessage(0);
+//         break;
+//     default:
+//         return DefWindowProcW(hWnd,msg,wp,lp);
+//     }
+// }
+
+// void AddControls(HWND hWnd){
+//     CreateWindowW(L"button",L"Abrir arquivo:", WS_VISIBLE | WS_CHILD,115,10,250,36,hWnd,(HMENU)OPEN_FILE_BUTTON,NULL,NULL);
+//     CreateWindowW(L"button",L"Salvar:", WS_VISIBLE | WS_CHILD,375,10,250,36,hWnd,(HMENU)SAVE_FILE_BUTTON,NULL,NULL);
+//     CreateWindowW(L"button",L"Compilar:", WS_VISIBLE | WS_CHILD,635,10,250,36,hWnd,(HMENU)COMPILE_BUTTON,NULL,NULL);
+//     hEdit = CreateWindowW(L"Edit",L"Insira o codigo aqui",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
+//                   10,50,250,300,hWnd,NULL,NULL,NULL);
+//     hQuadrupla = CreateWindowW(L"Edit",L"Quadruplas",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
+//                   270,50,250,300,hWnd,NULL,NULL,NULL);
+//     hCod_inter = CreateWindowW(L"Edit",L"Codigo Intermediario",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
+//                   530,50,250,300,hWnd,NULL,NULL,NULL);
+//     hCod_inter_otimi = CreateWindowW(L"Edit",L"Codigo Intermediario otimizado",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
+//                   790,50,250,300,hWnd,NULL,NULL,NULL);
+// }
