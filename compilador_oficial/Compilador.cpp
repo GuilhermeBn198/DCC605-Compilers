@@ -1,4 +1,4 @@
-/*Compilador feito como trabalho final da disciplina de compiladoresDCC605 ministrada pelo
+/*Compilador feito como trabalho final da disciplina de compiladores DCC605 ministrada pelo
 professor Luciano*/
 //Author: Guilherme Lucas Pereira Bernardo
 
@@ -9,10 +9,6 @@ professor Luciano*/
 #include <stdlib.h>
 #include <stack>
 #include <windows.h>
-
-#define OPEN_FILE_BUTTON 1
-#define SAVE_FILE_BUTTON 2
-#define COMPILE_BUTTON 3
 
 using namespace std;
 
@@ -46,14 +42,14 @@ Lista* lst_insere(Lista* l, char token[], int cod, int line){
 }
 
 //: This function is used to copy the nodes from the source list into the destination list in reverse order. It takes two parameters - a pointer to the destination list and a pointer to the source list.
-Lista* lst_cpy_inver(Lista* dest, Lista* source){
+Lista* lst_cpy_inver(Lista* destino, Lista* fonte){
     Lista* p;
-    p=source;
+    p=fonte;
     while(p!=NULL){
-        dest=lst_insere(dest,p->token,p->cod,p->line);
+        destino=lst_insere(destino,p->token,p->cod,p->line);
         p=p->prox;
     }
-    return dest;
+    return destino;
 }
 
 //This function is used to print the elements of the list. It takes a pointer to the list as a parameter. It iterates over the list and for each node, it prints the token, the code, and the line number
@@ -1463,6 +1459,7 @@ void checa_var_declara(Lista* l){
 //************************Geracao do codigo ******************************
 string quadruplaSTR;
 
+
 Quadrupla* quadrupla_cria(void){
     return NULL;
 }
@@ -1853,7 +1850,29 @@ void espaco(){
     std::cout << "\n\n";
 }
 
-void compilar(){
+// serve para visualizar uma lista ligada
+void visualiza_lista(Lista* lista){
+    Lista* temp = lista;
+    if(temp != NULL) {
+        cout << "The list contains: ";
+        while(temp != NULL) {
+            cout << temp->token << " ";
+            temp = temp->prox;
+        }
+        cout << endl;
+    } else {
+        cout << "The list is empty.\n";
+    }
+}
+
+void compilar(std::string fileContent){
+    int MainWindow, edit;
+    string quadrupla;
+    char* quadruplaCharArr = nullptr;                                                       // Initialize to nullptr
+    string cod_inter = nullptr;                                                             // Initialize to nullptr
+    char* cod_intermediario_arr = nullptr;                                                  // Initialize to nullptr
+    char* cod_intermediario_otimi_arr = nullptr;                                            // Initialize to nullptr
+    string cod_intermediario_otimi;
     Lista* l;
     l=lst_cria();
 
@@ -1861,201 +1880,75 @@ void compilar(){
     p = fopen("saida.txt", "w");
     fprintf(p,".data\n\n");
     fclose(p);
-}
 
-int main() {
-    int option;
-    std::string filename;
-    std::cout << "\t\tbem vindo ao compilador do Guilherme Bernardo";
-    espaco();
-    std::cout << "ele eh capaz de aceitar operacoes basicas de aritmetica como + - * /. Tambem suporta o uso de ( e )\n";
-    std::cout << "suas limitacoes sao devidas a um problema na identificacao do automato envolvendo floats, que apesar de acertar mais numeros depois da virgula, so ira apresentar um no output\n";
-    std::cout << "ha tambem uma limitacao no uso de variaveis, que so pode conter 1 caractere";
-    espaco();
-    espaco();
-    std::cout << "Selecione uma opcao:\n";
-    std::cout << "1. Ler arquivo\n";
-    std::cout << "2. fechar aplicacao\n";
-    std::cin >> option;
-
-    switch(option) {
-        case 1:{
-                espaco();
-                std::cout << "digite o nome do arquivo presente no diretorio: ";
-                std::cin >> filename;
-                std::string fileContent = readFile(filename); //faz a leitura do arquivo selecionado
-                if (fileContent == "") return 1; // encerra aplicação com o erro de abertura de arquivo
-                espaco();
-                espaco();
-                int optionvisualizacao;
-                std::cout << "Selecione uma opcao:\n"; //verifica se quer apenas visualizar o conteudo do arquivo
-                std::cout << "1. visualizar conteudo do arquivo\n";
-                std::cout << "2. fechar aplicacao\n";
-                std::cin >> optionvisualizacao;
-                espaco();
-                switch (optionvisualizacao){
-                case 1: {
-                        std::cout << fileContent << std::endl; // Print the file content on the screen
-                        espaco();
-
-                        std::cout << "começando agora a compilação do arquivo";
-                        break;
-                    }
-                    case 2:
-                        std::cout << "encerrando aplicacao.\n";
-                        return 0;
-                default:
-                    std::cout << "opcao invalida.\n";
-                    return 1;
-                }
-                return 1;
-            }
-        case 2:
-            std::cout << "encerrando aplicacao.\n";
-            return 0;
-        default:
-            std::cout << "opcao invalida.\n";
-            return 1;
+    int _size = fileContent.length();  
+    char *data = new char[_size+1];
+    fileContent.copy(data, _size);
+    data[_size] = '\0';
+    // espaco();
+    // std::cout << _size;                                                                  //verificar se ta funcionando a importação dos dados do arquivo
+    // espaco();
+    // std::cout << data << std::endl;                                                      // Print the file content on the screen
+    
+    /////////////// fase de analise lexica //////////////////
+    char exp[100];
+    int i=0,i2=0,numLinha=0;
+    while(i<_size){
+        exp[i2]=data[i];
+        i++;
+        i2++;
+        if(data[i-1]==';'){
+            exp[i2]='\0';
+            l=analise_lexica(exp,100,l,numLinha);
+            exp[0]='\0';
+            i2=0;
+        }
+        if(data[i]=='\n')
+            numLinha++;
+            //std::cout << numLinha <<std::endl;                                            //visualiza a contagem de linhas
     }
 
-    return 0;
-}
 
-// //interface
-// LRESULT CALLBACK WindowProcedure(HWND,UINT,WPARAM,LPARAM);
+    // for(int j=0; j<_size; j++){                                                          //visualiza a separacao os tokens
+    //     std::cout << data[j] << std::endl; 
+    // }
 
-// void AddControls(HWND);
 
-// HWND hMainWindow,hEdit, hQuadrupla, hCod_inter, hCod_inter_otimi;
+    /////////////// fase de analise sintatica //////////////////
 
-// //main
-// int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hPrevInst, LPSTR atgs, int ncmdshow){
+    // lista de tokens da fase sintatica
+    Lista* l2;
+    l2=lst_cria();
+    espaco();
+    visualiza_lista(l2);
+    cout << "lista vazia criada";
+    espaco();
+    if(error==0){
+        l2=lst_cpy_inver(l,l2);
+        visualiza_lista(l2);
+        cout << "lista preenchida de forma invertida";
+        // l2=lst_cpy_inver(l2,l); //original
+        // visualiza_lista(l2);
+        // cout << "lista preenchida de forma invertida original";
+        espaco();
+        analise_sintatica(l2);
+    }
+    // visualiza_lista(l2);                                                                 //visualiza lista preenchida
+    // cout << "lista preenchida";
+    lst_libera(l);
 
-//     WNDCLASSW wc = {0};
 
-//     wc.hbrBackground = (HBRUSH)COLOR_WINDOW;
-//     wc.hCursor = LoadCursor(NULL,IDC_ARROW);
-//     wc.hInstance = hInst;
-//     wc.lpszClassName = L"myWindowClass";
-//     wc.lpfnWndProc = WindowProcedure;
+    ///////////////// fase de analise semantica //////////////////
+    if(error==0){
+        var_declara=lst_cria();
+        var_declara=lst_cpy_var(var_declara,l2);
+        checa_var_declara(l2);
+        lst_libera(var_declara);
+        if(error==1) quadrupla_libera(q2);
+    }
 
-//     if(!RegisterClassW(&wc))
-//         return -1;
-
-//     hMainWindow = CreateWindowW(L"myWindowClass",L"Compilador",WS_OVERLAPPEDWINDOW | WS_VISIBLE,100,100,1060,500,NULL,NULL,NULL,NULL);
-
-//     MSG msg = {0};
-
-//     while(GetMessage(&msg,NULL,NULL,NULL)){
-//         TranslateMessage(&msg);
-//         DispatchMessage(&msg);
-//     }
-
-//     return 0;
-// }
-
-// void open_file(HWND hWnd){
-//     OPENFILENAME ofn;
-
-//     char file_name[200];
-
-//     ZeroMemory(&ofn,sizeof(OPENFILENAME));
-
-//     ofn.lStructSize = sizeof(OPENFILENAME);
-//     ofn.hwndOwner = hWnd;
-//     ofn.lpstrFile = file_name;
-//     ofn.lpstrFile[0] = '\0';
-//     ofn.nMaxFile = 200;
-//     ofn.lpstrFilter = "All files\0*.*\0Source Files\0*.CPP\0Text Files\0*.TXT\0";
-//     ofn.nFilterIndex = 1;
-
-//     GetOpenFileName(&ofn);
-
-//     //MessageBox(NULL,ofn.lpstrFile,"",MB_OK); //mostra o caminho do arquivo
-
-//     display_file(ofn.lpstrFile);
-// }
-
-// void write_file(char *path){
-//     FILE *file;
-//     file = fopen(path,"w");
-
-//     int _size = GetWindowTextLength(hEdit);
-//     char *data = new char[_size+1];
-//     GetWindowText(hEdit,data,_size+1);
-
-//     fwrite(data,_size+1,1,file);
-
-//     fclose(file);
-// }
-
-// void save_file(HWND hWnd){
-//     OPENFILENAME ofn;
-
-//     char file_name[100];
-
-//     ZeroMemory(&ofn,sizeof(OPENFILENAME));
-
-//     ofn.lStructSize = sizeof(OPENFILENAME);
-//     ofn.hwndOwner = hWnd;
-//     ofn.lpstrFile = file_name;
-//     ofn.lpstrFile[0] = '\0';
-//     ofn.nMaxFile = 100;
-//     ofn.lpstrFilter = "All files\0*.*\0Source Files\0*.CPP\0Text Files\0*.TXT\0";
-//     ofn.nFilterIndex = 1;
-
-//     GetSaveFileName(&ofn);
-
-//     write_file(ofn.lpstrFile);
-// }
-
-// void compilar(HWND hWnd){
-//     Lista* l;
-//     l=lst_cria();
-
-//     FILE *p;
-//     p = fopen("saida.txt", "w");
-//     fprintf(p,".data\n\n");
-//     fclose(p);
-
-//     int _size = GetWindowTextLength(hEdit);
-//     char *data = new char[_size+1];
-//     GetWindowText(hEdit,data,_size+1);
-//     //cout << data << endl << endl;
-//     char exp[100];
-//     int i=0,i2=0,numLinha=0;
-//     while(i<_size){
-//         exp[i2]=data[i];
-//         i++;
-//         i2++;
-//         if(data[i-1]==';'){
-//             exp[i2]='\0';
-//             l=analise_lexica(exp,100,l,numLinha);
-//             exp[0]='\0';
-//             i2=0;
-//         }
-//         if(data[i]=='\n')
-//             numLinha++;
-//     }
-
-//     Lista* l2;
-//     l2=lst_cria();
-
-//     if(error==0){
-//         l2=lst_cpy_inver(l2,l);
-//         analise_sintatica(l2);
-//     }
-//     lst_libera(l);
-//     if(error==0){
-//         var_declara=lst_cria();
-//         var_declara=lst_cpy_var(var_declara,l2);
-//         checa_var_declara(l2);
-//         lst_libera(var_declara);
-//         if(error==1)
-//             quadrupla_libera(q2);
-
-//     }
-//     lst_libera(l2);
+    
+    ///////////////// fase de geração de código //////////////////
 //     if(error==0){
 //         gera_mips2(q2);
 //         int i=0;
@@ -2084,75 +1977,130 @@ int main() {
 //         SetWindowText(hCod_inter_otimi, cod_intermediario_otimi_arr);
 //         quadrupla_libera(q2);
 //     }
-//     if(error==1 || error==2){
-//         error=0;
-//         wchar_t wtext[201];
-//         if(erroSyntax<2){
-//             SetWindowText(hQuadrupla, "");
-//             SetWindowText(hCod_inter, "");
-//             SetWindowText(hCod_inter_otimi, "");
+    lst_libera(l2);
+    if(error == 0){
+        gera_mips2(q2);
+        int i = 0;  
+        quadruplaCharArr = new char[quadruplaSTR.length() + 1];                             // Allocate memory
+        while(i < quadruplaSTR.length() + 1){
+            quadruplaCharArr[i]=quadruplaSTR[i];
+            i++;
+        }
+        quadruplaCharArr[i]='\0';
+        std::cout << quadruplaCharArr;
+    }
+    quadrupla = quadruplaCharArr;                                                           // tem que verificar se ta funcionando!!
 
-//             mbstowcs(wtext, erroMsg, strlen(erroMsg)+1);
-//             LPWSTR ptr = wtext;
-//             MessageBoxW(hWnd,ptr,L"Erro!", MB_OK | MB_ICONEXCLAMATION);
-//         }
-//         cout << erroMsg << endl;
-//         strcpy(erroMsg,"");
-//         while(!pilha_arvore.empty()){
-//             pilha_arvore.pop();
-//             pilha_arvore_exp.pop();
-//         }
-//         while(!pilha_gen_arvS.empty()){
-//             pilha_gen_arvS.pop();
-//             pilha_gen_arvS_exp.pop();
-//         }
-//         if(erroSyntax<2 && erroSyntax>0)
-//             compilar(hWnd);
-//         else
-//             erroSyntax=0;
-//     }
-// }
+    i=0;
+    cod_inter = cod_intermediario_arr;                                                      // tem q verificar se ta funcionando!!
+    cod_intermediario_arr = new char[cod_intermediarioSTR.length() + 1];                    // Allocate memory 
+    while(i<cod_intermediarioSTR.length()+ 1){                                              // tem q verificar se ta funcionando!!
+        cod_intermediario_arr[i]=cod_intermediarioSTR[i]; 
+        i++;
+    }
+    cod_intermediario_arr[i]='\0';
+    cod_inter = cod_intermediario_arr;                                                      // tem que verificar se ta funcionando!!
+    i=0;
 
-// LRESULT CALLBACK WindowProcedure(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
-//     switch(msg)
-//     {
-//     case WM_COMMAND:
-//         {
-//             switch(wp)
-//             {
-//             case OPEN_FILE_BUTTON:
-//                 open_file(hWnd);
-//                 break;
-//             case SAVE_FILE_BUTTON:
-//                 save_file(hWnd);
-//                 break;
-//             case COMPILE_BUTTON:
-//                 compilar(hWnd);
-//                 break;
-//             }
-//         }
-//         break;
-//     case WM_CREATE:
-//         AddControls(hWnd);
-//         break;
-//     case WM_DESTROY:
-//         PostQuitMessage(0);
-//         break;
-//     default:
-//         return DefWindowProcW(hWnd,msg,wp,lp);
-//     }
-// }
+    cod_intermediario_otimi_arr = new char[cod_intermediario_otimiSTR.length() + 1];        // Allocate memory 
+    while(i<cod_intermediario_otimiSTR.length() + 1){
+        cod_intermediario_otimi_arr[i]=cod_intermediario_otimiSTR[i];
+        i++;
+    }
+    cod_intermediario_otimi_arr[i]='\0';
+    cod_intermediario_otimi = cod_intermediario_otimi_arr;                                  // tem que verificar se ta funcionando!!
+    quadrupla_libera(q2);
+        
+    if(error==1 || error==2){
+        error=0;
+        char text[201];
+        if(erroSyntax < 2){
+            quadrupla = "";
+            cod_inter = "";
+            cod_intermediario_otimi = "";
+            cout << erroMsg << endl;
+        }
+        cout << erroMsg << endl;
+        strcpy(erroMsg,"");
+        while(!pilha_arvore.empty()){
+            pilha_arvore.pop();
+            pilha_arvore_exp.pop();
+        }
+        while(!pilha_gen_arvS.empty()){
+            pilha_gen_arvS.pop();
+            pilha_gen_arvS_exp.pop();
+        }
+        if(erroSyntax<2 && erroSyntax>0)
+            compilar(fileContent);
+        else
+            erroSyntax=0;
+    }
+    delete[] data;
+    delete[] quadruplaCharArr;
+    delete[] cod_intermediario_arr;
+    delete[] cod_intermediario_otimi_arr;
 
-// void AddControls(HWND hWnd){
-//     CreateWindowW(L"button",L"Abrir arquivo:", WS_VISIBLE | WS_CHILD,115,10,250,36,hWnd,(HMENU)OPEN_FILE_BUTTON,NULL,NULL);
-//     CreateWindowW(L"button",L"Salvar:", WS_VISIBLE | WS_CHILD,375,10,250,36,hWnd,(HMENU)SAVE_FILE_BUTTON,NULL,NULL);
-//     CreateWindowW(L"button",L"Compilar:", WS_VISIBLE | WS_CHILD,635,10,250,36,hWnd,(HMENU)COMPILE_BUTTON,NULL,NULL);
-//     hEdit = CreateWindowW(L"Edit",L"Insira o codigo aqui",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
-//                   10,50,250,300,hWnd,NULL,NULL,NULL);
-//     hQuadrupla = CreateWindowW(L"Edit",L"Quadruplas",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
-//                   270,50,250,300,hWnd,NULL,NULL,NULL);
-//     hCod_inter = CreateWindowW(L"Edit",L"Codigo Intermediario",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
-//                   530,50,250,300,hWnd,NULL,NULL,NULL);
-//     hCod_inter_otimi = CreateWindowW(L"Edit",L"Codigo Intermediario otimizado",WS_VISIBLE | WS_CHILD | ES_MULTILINE | WS_BORDER | WS_VSCROLL | WS_HSCROLL,
-//                   790,50,250,300,hWnd,NULL,NULL,NULL);
-// }
+}
+
+
+int main() {
+    //variaveis essenciais
+    int option, optionvisualizacao;
+    std::string filename, fileContent;
+
+    //cabecalho
+    std::cout << "\t\tbem vindo ao compilador do Guilherme Bernardo";
+    espaco();
+    std::cout << "ele eh capaz de aceitar operacoes basicas de aritmetica como + - * /. Tambem suporta o uso de ( e )\n";
+    std::cout << "suas limitacoes sao devidas a um problema na identificacao do automato envolvendo floats, que apesar de acertar mais numeros depois da virgula, so ira apresentar um no output\n";
+    std::cout << "ha tambem uma limitacao no uso de variaveis, que so pode conter 1 caractere";
+    espaco();
+    espaco();
+
+    //codigo comeca aqui
+    std::cout << "Selecione uma opcao:\n";
+    std::cout << "1. Ler arquivo\n";
+    std::cout << "2. fechar aplicacao\n";
+    std::cin >> option;
+
+    switch(option) {
+        case 1:{
+                std::cout << "digite o nome do arquivo presente no diretorio: ";
+                std::cin >> filename;
+                fileContent = readFile(filename);                                           //faz a leitura do arquivo selecionado
+                if (fileContent == "") return 1;                                            // encerra aplicação com o erro de abertura de arquivo
+                espaco();
+                espaco();
+                std::cout << "Selecione uma opcao:\n";                                      //verifica se quer apenas visualizar o conteudo do arquivo
+                std::cout << "1. visualizar conteudo do arquivo\n";
+                std::cout << "2. fechar aplicacao\n";
+                std::cin >> optionvisualizacao;
+                espaco();
+                switch (optionvisualizacao){
+                case 1: {
+                        //std::cout << fileContent << std::endl;                            // Print the file content on the screen
+                        espaco();
+                        std::cout << "comecando agora a compilacao do arquivo";
+                        espaco();
+                        compilar(fileContent);
+                        return 0;
+                    }
+                    case 2:
+                        std::cout << "encerrando aplicacao.\n";
+                        return 0;
+                default:
+                    std::cout << "opcao invalida.\n";
+                    return 1;
+                }
+                return 1;
+            }
+        case 2:
+            std::cout << "encerrando aplicacao.\n";
+            return 0;
+        default:
+            std::cout << "opcao invalida.\n";
+            return 1;
+    }
+
+    return 0;
+}
