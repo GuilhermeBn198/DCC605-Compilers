@@ -61,9 +61,9 @@ void lst_imprime(Lista* l){
     Lista* p;
     p=l;
     while(p!=NULL){
-        cout << "token: " << p->token << endl;
-        cout << "codigo: " << p->cod << endl;
-        cout << "linha: " << p->line << endl;
+        std::cout << "token: " << p->token << endl;
+        std::cout << "codigo: " << p->cod << endl;
+        std::cout << "linha: " << p->line << endl;
         p=p->prox;
     }
 }
@@ -316,18 +316,18 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
 
             if (isDelimiter(token[right]) == true && left == right) {
                 if (isOperator(token[right]) == true){
-                    cout << token[right] << " IS AN OPERATOR" << endl; // printa a detecção de operadores
+                    std::cout << token[right] << " IS AN OPERATOR" << endl; // printa a detecção de operadores
                     char tokenCH[2];tokenCH[0]=token[right];tokenCH[1]='\0';
                     l = lst_insere(l, tokenCH, 1, line);
                 }
                 else if(isDelimiterChar(token[right]) == true){
                     if(token[right]==';') //
-                        cout << token[right] << endl<<endl<<endl; // printa algo q n sei ainda
+                        std::cout << token[right] << endl<<endl<<endl; // printa algo q n sei ainda
                     char tokenCH[2];tokenCH[0]=token[right];tokenCH[1]='\0';
                     l = lst_insere(l, tokenCH, 6, line);
                 }
                 else if(isDelimiterfinal(token[right]) == true){
-                    cout << token[right] << endl<<endl<<endl; //
+                    std::cout << token[right] << endl<<endl<<endl; //
                     char tokenCH[2];tokenCH[0]=token[right];tokenCH[1]='\0';
                     l = lst_insere(l, tokenCH, 7, line);
                 }
@@ -337,15 +337,15 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
             else if (isDelimiter(token[right]) == true && left != right || (right == len && left != right)) {
                 char* subStr = subString(token, left, right - 1);
                 if (isKeyword(subStr) == true){
-                    cout << subStr<< " IS A KEYWORD" << endl; //printa a analise de keywords
+                    std::cout << subStr<< " IS A KEYWORD" << endl; //printa a analise de keywords
                     l = lst_insere(l, subStr, 2, line);
                 }
                 else if (AutomatoInteger(subStr) == true){
-                    cout << subStr << " IS AN INTEGER" << endl; // printa a analise de integers
+                    std::cout << subStr << " IS AN INTEGER" << endl; // printa a analise de integers
                     l = lst_insere(l, subStr, 3, line);
                 }
                 else if (AutomatoFloat(subStr) == true){
-                    cout << subStr << " IS A FLOAT NUMBER" << endl; // printa a analise de floats
+                    std::cout << subStr << " IS A FLOAT NUMBER" << endl; // printa a analise de floats
                     l = lst_insere(l, subStr, 4, line);
                 }
                 else if (AutomatoIdentifier(subStr) == true && isDelimiter(token[right - 1]) == false){
@@ -359,11 +359,11 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
                         strcat(erroMsg, subStr);
                         strcat(erroMsg, " eh muito grande este compilador nao esta apto a lidar com identificadores maiores do que 1 caractere");
                         error=1;
-                        cout << erroMsg << endl; //pra verificar se ta ok o arquivo
+                        std::cout << erroMsg << endl; //pra verificar se ta ok o arquivo
                         //exit(2); // erro de analise lexica
                         break;
                     }
-                    cout << subStr << " IS A VALID IDENTIFIER" << endl; //
+                    std::cout << subStr << " IS A VALID IDENTIFIER" << endl; //
                     l = lst_insere(l, subStr, 5, line);
                 }
                 //esta sendo carregado algum caractere oculto pela interface causando mal funcionamento desta parte
@@ -1103,7 +1103,7 @@ int AutomatoM(char *str, char *str2, int line){
         strcat(erroMsg, temp);
         strcat(erroMsg, " esperava )");
         error=2;
-        //cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+        std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
 
     }
     else if(parentese<0){
@@ -1114,7 +1114,7 @@ int AutomatoM(char *str, char *str2, int line){
         strcat(erroMsg, temp);
         strcat(erroMsg, " esperava (");
         error=2;
-        //cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+        std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
     }
 
     int k,QProd;
@@ -1326,7 +1326,7 @@ void analise_sintatica(Lista* l){
                     strcat(erroMsg, " falta ; antes de ");
                     strcat(erroMsg, p->prox->token);
                     error=1;
-                    cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+                    std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
                     exit(3); //erro de sintaxe
                 }
                 else if(p->cod==5 && p->prox->cod==7)
@@ -1388,7 +1388,7 @@ void analise_sintatica(Lista* l){
                     strcat(erroMsg, "Linha: ");
                     strcat(erroMsg, temp);
                     strcat(erroMsg, " erro de syntax");
-                    //cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+                    std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
                 }
                 break;
             }
@@ -1402,14 +1402,14 @@ void analise_sintatica(Lista* l){
     if(error==0){
         q2=quadrupla_cria();
         q2=quadrupla_cpy_inver(q2,q1);
-        //cout << "a quadrupla gerada do arquivo analisado pela analise sintatica eh:" << endl;
+        std::cout << "a quadrupla gerada do arquivo analisado pela analise sintatica eh:" << endl;
         quadrupla_imprime(q2);
-        cout << endl;
+        std::cout << endl;
         imprime_cod_itermediario(q2);
-        //cout << "o codigo intermediario gerado do arquivo analisado pela analise sintatica eh:" << endl;
+        //std::cout << "o codigo intermediario gerado do arquivo analisado pela analise sintatica eh:" << endl;
         otimiza_cod_intermediario(q2);
-        cout << endl;
-        //cout << "e seu codigo otimizado eh:" << endl;
+        std::cout << endl;
+        //std::cout << "e seu codigo otimizado eh:" << endl;
         imprime_cod_itermediario_otimizado(q2);
     }
     quadrupla_libera(q1);
@@ -1463,7 +1463,7 @@ void checa_var_declara(Lista* l){
                 strcat(erroMsg, p->token);
                 strcat(erroMsg, " nao foi declarado neste escopo");
                 error=1;
-                //cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+                //std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
                 break;
             }
         }
@@ -1504,7 +1504,7 @@ Quadrupla* quadrupla_cpy_inver(Quadrupla* dest, Quadrupla* source){
 void quadrupla_imprime(Quadrupla* q){
     Quadrupla* p;
     p=q;
-    cout << "op| " << "arg1| " << "arg2| " << "result" << endl;
+    std::cout << "op| " << "arg1| " << "arg2| " << "result" << endl;
     quadruplaSTR = "op | arg1 |  arg2 | result \r\n";
     char tempOp[1];
     while(p!=NULL){
@@ -1513,14 +1513,14 @@ void quadrupla_imprime(Quadrupla* q){
         quadruplaSTR = quadruplaSTR + p->arg1 + " | ";
         quadruplaSTR = quadruplaSTR + p->arg2 + " | ";
         quadruplaSTR = quadruplaSTR + p->result + " \r\n";
-        cout << p->op[0] << " | ";
-        cout << p->arg1 << " | ";
-        cout << p->arg2 << " | ";
-        cout << p->result << endl;
+        std::cout << p->op[0] << " | " << std::flush;
+        std::cout << p->arg1 << " | " << std::flush;
+        std::cout << p->arg2 << " | " << std::flush;
+        std::cout << p->result << endl;
         p=p->prox;
     }
-    cout << endl;
-    cout << quadruplaSTR << endl;
+    std::cout << endl;
+    std::cout << quadruplaSTR << endl;
 }
 
 void quadrupla_libera(Quadrupla* q){
@@ -1590,19 +1590,19 @@ void imprime_cod_itermediario(Quadrupla* q){
     char tempOp[1];
     while(p!=NULL){
         cod_intermediarioSTR = cod_intermediarioSTR + p->result + " := " + p->arg1 + " ";
-        cout << p->result << " := ";
-        cout << p->arg1 << " ";
+        std::cout << p->result << " := " << std::flush;
+        std::cout << p->arg1 << " " << std::flush;
         if(p->op[0]!='='){
             tempOp[0]=p->op[0];tempOp[1]='\0';
             cod_intermediarioSTR = cod_intermediarioSTR + tempOp + " ";
-            cout << p->op[0] << " ";
+            std::cout << p->op[0] << " " << std::flush;
         }
         if(strcmp(p->arg2,"&")!=0){
             cod_intermediarioSTR = cod_intermediarioSTR + p->arg2;
-            cout << p->arg2;
+            std::cout << p->arg2  << std::flush;
         }
         cod_intermediarioSTR = cod_intermediarioSTR + "\r\n";
-        cout << endl;
+        std::cout << endl;
         p=p->prox;
     }
 }
@@ -1700,24 +1700,24 @@ void imprime_cod_itermediario_otimizado(Quadrupla* q){
     while(p!=NULL){
         if(strcmp(p->result,"&")!=0){
             cod_intermediario_otimiSTR = cod_intermediario_otimiSTR + p->result + " := " + p->arg1 + " ";
-            cout << p->result << " := ";
-            cout << p->arg1 << " ";
+            std::cout << p->result << " := " << std::flush;
+            std::cout << p->arg1 << " " << std::flush;
             if(p->op[0]!='='){
                 tempOp[0]=p->op[0];tempOp[1]='\0';
                 cod_intermediario_otimiSTR = cod_intermediario_otimiSTR + tempOp + " ";
-                cout << p->op[0] << " ";
+                std::cout << p->op[0] << " " << std::flush;
             }
             if(strcmp(p->arg2,"&")){
                 cod_intermediario_otimiSTR = cod_intermediario_otimiSTR + p->arg2;
-                cout << p->arg2;
+                std::cout << p->arg2 << std::flush;
             }
 
             cod_intermediario_otimiSTR = cod_intermediario_otimiSTR + "\r\n";
-            cout << endl;
+            std::cout << endl;
         }
         p=p->prox;
     }
-    cout << endl << cod_intermediarioSTR << endl;
+    std::cout << endl << cod_intermediarioSTR << endl;
 }
 
 void gera_mips(char *var){
@@ -1734,7 +1734,7 @@ void gera_mips(char *var){
         fprintf(p, line);
 
         fclose(p);
-        cout << "codigo mips eviado ao arquivo" << endl;
+        std::cout << "codigo mips eviado ao arquivo" << endl;
     }
 }
 
@@ -1839,7 +1839,7 @@ void write_file(const std::string& path, const std::string& data){
 
 void save_file(const std::string& data){
     std::string filename;
-    std::cout << "Enter the filename to save: ";
+    std::cout << "Enter the filename to save: " << std::flush;
     std::cin >> filename;
 
     // Open the file in write mode.
@@ -1847,7 +1847,7 @@ void save_file(const std::string& data){
 
     // Check if the file was opened successfully.
     if (!file) {
-        std::cerr << "Unable to open file";
+        std::cerr << "Unable to open file" << std::flush;
         return;
     }
 
@@ -1859,23 +1859,23 @@ void save_file(const std::string& data){
 }
 
 void espaco(){
-    std::cout << "\n\n";
+    std::cout << endl << std::flush;
 }
 
 // serve para visualizar uma lista ligada
 void visualiza_lista(Lista* lista){
     Lista* temp = lista;
     if(temp != NULL) {
-        cout << "A atual lista contem: " << std::endl << std::endl;
+        std::cout << "A atual lista contem: " << std::endl << std::endl;
         while(temp != NULL) {
-            cout << temp->token << " ";
-            cout << temp->cod << " ";
-            cout << temp->line << endl;
+            std::cout << temp->token << " " << std::flush;
+            std::cout << temp->cod << " " << std::flush;
+            std::cout << temp->line << endl;
             temp = temp->prox;
         }
-        cout << endl;
+        std::cout << endl;
     } else {
-        cout << "A lista esta vazia.\n";
+        std::cout << "A lista esta vazia." << endl;
     }
 }
 
@@ -1904,7 +1904,7 @@ void compilar(std::string fileContent){
 
     espaco();
     // std::cout << "quantidade de caracteres" << std::endl;
-    // std::cout << _size;                                                                  //verificar se ta funcionando a importação dos dados de entrada
+    // std::cout <<  _size  << endl;                                                                  //verificar se ta funcionando a importação dos dados de entrada
     // espaco();
     // std::cout << "print dos dados recebidos por data" << std::endl;
     // std::cout << data << std::endl;                                                      //printar os dados recebidos(TA OK)
@@ -1914,7 +1914,7 @@ void compilar(std::string fileContent){
     char exp[100];
     int i=0,i2=0,numLinha=0;
     
-    cout << "\t\t**********inicializando fase de analise lexica dos dados providos**********" << std::endl << std::endl;
+    std::cout << "\t\t**********inicializando fase de analise lexica dos dados providos**********" << std::endl << std::endl;
     while(i<_size){
         exp[i2]=data[i];  //recebe os dados obtidos de fileContent
         i++;
@@ -1929,7 +1929,7 @@ void compilar(std::string fileContent){
             numLinha++;
             //std::cout << numLinha <<std::endl;                                            //visualiza a contagem de linhas
     }
-    // cout << std::endl << "visualizacao dos dados de l: token codigo linha." << std::endl;
+    // std::cout << "visualizacao dos dados de l: token codigo linha." << std::endl;
     // visualiza_lista(l);
 
     // for(int j=0; j<_size; j++){                                                          //visualiza a separacao dos tokens
@@ -1943,32 +1943,32 @@ void compilar(std::string fileContent){
     Lista* l2;
     l2=lst_cria();
     espaco();
-    cout << "\t\t**********Inicio da fase de analise sintatica dos dados providos**********";
+    std::cout << "\t\t**********Inicio da fase de analise sintatica dos dados providos**********" << std::flush;
     espaco();
     // visualiza_lista(l2);  // para visualizar l2 que esta atualmente vazia
     if(error==0){
-        cout << "se nenhum erro for detectado pela analise lexica entao o compilador executa a analise sintatica" << endl << endl;
+        std::cout << "se nenhum erro for detectado pela analise lexica entao o compilador executa a analise sintatica" << endl << endl;
         l2=lst_cpy_inver(l2,l); //original
-        // cout << "lista preenchida de forma invertida antes de passar pela analise sintatica" << endl;
+        // std::cout << "lista preenchida de forma invertida antes de passar pela analise sintatica" << endl;
         // visualiza_lista(l2);
         // espaco();
         analise_sintatica(l2);
-    cout << "passou da analise sintatica" << std::endl;
+    std::cout << "passou da analise sintatica" << std::endl;
     } 
      
-    // cout << "ao final da analise sintatica temos a da quadrupla, e do código intermediario" << std::endl;
-    cout << cod_inter << "1"<< endl;                                                                 //visualiza lista preenchida
-    cout << cod_intermediario_arr << "2"<< endl;                                                                 //visualiza lista preenchida
-    cout << cod_intermediario_otimi << "3"<< endl;                                                                 //visualiza lista preenchida
-    cout << cod_intermediario_otimi_arr << "4"<< endl;                                                                 //visualiza lista preenchida
-    cout << cod_intermediario_otimiSTR << "5"<< endl;                                                                 //visualiza lista preenchida
-    cout << cod_intermediarioSTR << "6"<< endl;                                                                 //visualiza lista preenchida
+    // std::cout << "ao final da analise sintatica temos a da quadrupla, e do código intermediario" << std::endl;
+    std::cout << cod_inter << "1"<< endl;                                                                 //visualiza lista preenchida
+    std::cout << cod_intermediario_arr << "2"<< endl;                                                                 //visualiza lista preenchida
+    std::cout << cod_intermediario_otimi << "3"<< endl;                                                                 //visualiza lista preenchida
+    std::cout << cod_intermediario_otimi_arr << "4"<< endl;                                                                 //visualiza lista preenchida
+    std::cout << cod_intermediario_otimiSTR << "5"<< endl;                                                                 //visualiza lista preenchida
+    std::cout << cod_intermediarioSTR << "6"<< endl;                                                                 //visualiza lista preenchida
     lst_libera(l);
 
 
     ///////////////// fase de analise semantica //////////////////
     espaco();
-    cout << "inicio da analise semantica";
+    std::cout << "inicio da analise semantica" << std::endl;
     espaco();
     if(error==0){
         var_declara=lst_cria();
@@ -1982,7 +1982,7 @@ void compilar(std::string fileContent){
     lst_libera(l2);
     if(error == 0){
         gera_mips2(q2);
-        //cout << "teste pra saber se chegou aqui" << endl;
+        //std::cout << "teste pra saber se chegou aqui" << endl;
         int i = 0;
         quadruplaCharArr = new char[quadruplaSTR.length() + 1];                             // Allocate memory
         while(i < quadruplaSTR.length() + 1){
@@ -1990,10 +1990,10 @@ void compilar(std::string fileContent){
             i++;
         }
         quadruplaCharArr[i]='\0';
-        std::cout << quadruplaCharArr;
+        std::cout << quadruplaCharArr  << std::flush;
     }
     quadrupla = quadruplaCharArr;
-    cout << quadrupla << std::endl; //testando                                                          
+    std::cout << quadrupla << std::endl; //testando                                                          
 
     i=0;
     cod_inter = cod_intermediario_arr;                                                      // tem q verificar se ta funcionando!!
@@ -2022,9 +2022,9 @@ void compilar(std::string fileContent){
             quadrupla = "";
             cod_inter = "";
             cod_intermediario_otimi = "";
-            cout << erroMsg << endl;
+            std::cout << erroMsg << endl;
         }
-        cout << erroMsg << endl;
+        std::cout << erroMsg << endl;
         strcpy(erroMsg,"");
         while(!pilha_arvore.empty()){
             pilha_arvore.pop();
@@ -2053,55 +2053,55 @@ int main() {
     std::string filename, fileContent;
 
     //cabecalho
-    std::cout << "\t\tbem vindo ao compilador do Guilherme Bernardo";
+    std::cout << "\t\tbem vindo ao compilador do Guilherme Bernardo" << std::flush;
     espaco();
-    std::cout << "ele eh capaz de aceitar operacoes basicas de aritmetica como + - * /. Tambem suporta o uso de ( e )\n";
-    std::cout << "suas limitacoes sao devidas a um problema na identificacao do automato envolvendo floats, que apesar de acertar mais numeros depois da virgula, so ira apresentar um no output\n";
-    std::cout << "ha tambem uma limitacao no uso de variaveis, que so pode conter 1 caractere";
+    std::cout << "ele eh capaz de aceitar operacoes basicas de aritmetica como + - * /. Tambem suporta o uso de ( e )" << std::endl;
+    std::cout << "suas limitacoes sao devidas a um problema na identificacao do automato envolvendo floats, que apesar de acertar mais numeros depois da virgula, so ira apresentar um no output" << std::endl;
+    std::cout << "ha tambem uma limitacao no uso de variaveis, que so pode conter 1 caractere" << std::flush;
     espaco();
     espaco();
 
     //codigo comeca aqui
-    std::cout << "Selecione uma opcao:\n";
-    std::cout << "1. Ler arquivo\n";
-    std::cout << "2. fechar aplicacao\n";
+    std::cout << "Selecione uma opcao:" << std::endl;
+    std::cout << "1. Ler arquivo" << std::endl;
+    std::cout << "2. fechar aplicacao" << std::endl;
     std::cin >> option;
 
     switch(option) {
         case 1:{
-                std::cout << "digite o nome do arquivo presente no diretorio: ";
+                std::cout << "digite o nome do arquivo presente no diretorio: "<< std::flush;
                 std::cin >> filename;
                 fileContent = readFile(filename);                                           //faz a leitura do arquivo selecionado
                 if (fileContent == "") return 1;                                            // encerra aplicação com o erro de abertura de arquivo
                 espaco();
                 espaco();
-                std::cout << "Selecione uma opcao:\n";                                      //verifica se quer apenas visualizar o conteudo do arquivo
-                std::cout << "1. visualizar conteudo do arquivo\n";
-                std::cout << "2. fechar aplicacao\n";
+                std::cout << "Selecione uma opcao:"<< std::endl;                                      //verifica se quer apenas visualizar o conteudo do arquivo
+                std::cout << "1. visualizar conteudo do arquivo"<< std::endl;
+                std::cout << "2. fechar aplicacao"<< std::endl;
                 std::cin >> optionvisualizacao;
                 espaco();
                 switch (optionvisualizacao){
                 case 1: {
                         //std::cout << fileContent << std::endl;                            // Print the file content on the screen
                         espaco();
-                        std::cout << "comecando a compilacao do arquivo";
+                        std::cout << "comecando a compilacao do arquivo"<< std::endl;
                         compilar(fileContent);
                         return 0;
                     }
                     case 2:
-                        std::cout << "encerrando aplicacao.\n";
+                        std::cout << "encerrando aplicacao."<< std::endl;
                         return 0;
                 default:
-                    std::cout << "opcao invalida.\n";
+                    std::cout << "opcao invalida."<< std::endl;
                     return 1;
                 }
                 return 1;
             }
         case 2:
-            std::cout << "encerrando aplicacao.\n";
+            std::cout << "encerrando aplicacao." << std::endl;
             return 0;
         default:
-            std::cout << "opcao invalida.\n";
+            std::cout << "opcao invalida." << std::endl;
             return 1;
     }
 

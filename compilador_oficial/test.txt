@@ -1,2 +1,2 @@
 float t;
-int y
+int y;
