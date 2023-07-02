@@ -8,7 +8,9 @@ professor Luciano*/
 #include <string.h>
 #include <stdlib.h>
 #include <stack>
-#include <windows.h>
+#include <fstream>
+#include <vector>
+#include <string>
 
 using namespace std;
 
@@ -18,6 +20,8 @@ int  error=0;
 //************************analise lexica****************************
 
 /* legenda: 1- Operador, 2- Keyword, 3- Integer, 4- float, 5- Identifier, 6- delimiter, 7- finalDelimeter,8- InvalidIdentifier*/
+
+//lista com char token, int cod, struct lista prox, int line.
 typedef struct lista{
     char token[35];
     int cod;
@@ -26,12 +30,12 @@ typedef struct lista{
 }Lista;
 
 
-//This function is used to create a new list. It returns NULL which represents an empty list in this context.
+//Esta função é usada para criar uma nova lista. Ele retorna NULL que representa uma lista vazia neste contexto.
 Lista* lst_cria(void){
     return NULL;
 }
 
-//This function is used to insert a new node at the beginning of the list. It takes four parameters - a pointer to the list, a token (as a character array), a code, and a line number.
+//Esta função é utilizada para inserir um novo nó no início da lista. Leva quatro parâmetros - um ponteiro para a lista, um token (como uma matriz de caracteres), um código e um número de linha.
 Lista* lst_insere(Lista* l, char token[], int cod, int line){
     Lista* no = (Lista*)malloc(sizeof(Lista));
     strcpy(no->token,token);
@@ -41,7 +45,7 @@ Lista* lst_insere(Lista* l, char token[], int cod, int line){
     return no;
 }
 
-//: This function is used to copy the nodes from the source list into the destination list in reverse order. It takes two parameters - a pointer to the destination list and a pointer to the source list.
+// Esta função é usada para copiar os nós da lista de origem para a lista de destino na ordem inversa. Leva dois parâmetros - um ponteiro para a lista de destino e um ponteiro para a lista de origem.
 Lista* lst_cpy_inver(Lista* destino, Lista* fonte){
     Lista* p;
     p=fonte;
@@ -52,7 +56,7 @@ Lista* lst_cpy_inver(Lista* destino, Lista* fonte){
     return destino;
 }
 
-//This function is used to print the elements of the list. It takes a pointer to the list as a parameter. It iterates over the list and for each node, it prints the token, the code, and the line number
+//Esta função é usada para imprimir os elementos da lista. Leva um ponteiro para a lista como parâmetro. Ele itera sobre a lista e, para cada nó, imprime o token, o código e o número da linha
 void lst_imprime(Lista* l){
     Lista* p;
     p=l;
@@ -64,12 +68,12 @@ void lst_imprime(Lista* l){
     }
 }
 
-//This function checks if the list is empty. It takes a pointer to the list as a parameter and returns true (or 1) if the list is empty (i.e., the pointer is NULL), and false (or 0) otherwise.
+//Esta função verifica se a lista está vazia. Ele recebe um ponteiro para a lista como parâmetro e retorna verdadeiro (ou 1) se a lista estiver vazia (ou seja, o ponteiro é NULL) e falso (ou 0) caso contrário.
 int lst_vazia(Lista* l){
     return(l==NULL);
 }
 
-//This function is used to free up the memory occupied by the list. It takes a pointer to the list as a parameter. It iterates over the list, and for each node, it frees the memory allocated to the node using the free() function.
+//Esta função é utilizada para liberar a memória ocupada pela lista. Leva um ponteiro para a lista como parâmetro. Ele itera sobre a lista e, para cada nó, libera a memória alocada para o nó usando a função free().
 void lst_libera(Lista* l){
     Lista* p;
     p=l;
@@ -80,7 +84,7 @@ void lst_libera(Lista* l){
     }
 }
 
-//This function checks if a given token is a keyword. In this example, "int" and "float" are considered as keywords. It takes a character pointer (string) as an argument and returns true if the string matches either "int" or "float", false otherwise.
+//Esta função verifica se um determinado token é uma palavra-chave. Neste exemplo, "int" e "float" são considerados palavras-chave. Ele recebe um ponteiro de caractere (estilo C) como argumento e retorna true se a string corresponder a "int" ou "float", caso contrário, false.
 bool isKeyword(char* token) {
     if (!strcmp(token, "int") || !strcmp(token, "float"))
         return (true);
@@ -88,7 +92,7 @@ bool isKeyword(char* token) {
 }
 
 
-//L = {w|w (+|-|num)(num)num*}
+//automato da linguagem de inteiros: L = {w|w (+|-|num)(num)num*} recebe ponteiro de caractere (estilo C)
 int AutomatoInteger (char *str){
     //inicial 0, final 2
     int i;
@@ -132,7 +136,7 @@ int AutomatoInteger (char *str){
         return 0;
 }
 
-//L = {w|w (+|-|num)(num)num*(.)(num)num*}
+//automato da linguagem de numeros floats: L = {w|w (+|-|num)(num)num*(.)(num)num*} recebe ponteiro de char
 int AutomatoFloat (char *str){
     //inicial 0, final 4
     int i;
@@ -176,7 +180,7 @@ int AutomatoFloat (char *str){
         return 0;
 }
 
-//L = {w|w letra(letra|numero)*}
+//automato da linguagem de identificadores L = {w|w letra(letra|numero)*} recebe ponteiro de char *
 int AutomatoIdentifier (char *str){
     int i;
     /* Declarando a matriz de estados do automato M */
@@ -241,14 +245,14 @@ int AutomatoIdentifier (char *str){
         return 0;
 }
 
-//This function checks if a given character is a final delimiter. In this case, the function returns true if the character is a semicolon (';'), and false otherwise.
+//Esta função verifica se um determinado caractere é um delimitador final. Nesse caso, a função retorna true se o caractere for um ponto e vírgula (';') e false caso contrário. recebe char
 bool isDelimiterfinal(char ch){
     if (ch == ';')
         return (true);
     return (false);
 }
 
-// Returns 'true' if the character is a DELIMITER.
+// Retorna 'true' se o caractere for um delimitador. recebe char
 bool isDelimiter(char ch){
     if (ch == ' ' || ch == ';' || ch == '+' || ch == '-' || ch == '*' ||
         ch == '/' || ch == ',' || ch == '=' || ch == '(' ||
@@ -257,7 +261,7 @@ bool isDelimiter(char ch){
     return (false);
 }
 
-// This function checks if a given character is a character delimiter. It returns true if the character is a comma, parenthesis, single quote, or double quote. It returns false otherwise.
+// Esta função verifica se um determinado caractere é um delimitador de caracteres. Ele retorna verdadeiro se o caractere for uma vírgula, parênteses, aspas simples ou aspas duplas. Caso contrário, retorna false. recebe char
 bool isDelimiterChar(char ch){
     if (ch == ',' || ch == '(' || ch == ')' ||
         ch == '\'' || ch == '"')
@@ -265,7 +269,7 @@ bool isDelimiterChar(char ch){
     return (false);
 }
 
-// Returns 'true' if the character is an OPERATOR.
+// Retorna 'true' se o caractere for um operador, recebe char.
 bool isOperator(char ch){
     if (ch == '+' || ch == '-' || ch == '*' ||
         ch == '/' || ch == '=')
@@ -276,10 +280,10 @@ bool isOperator(char ch){
 Lista* separateAndAnalyze(char *parse, Lista* l, int line);
 char* subString(char* str, int left, int right);
 
-
+// funcao de analise lexica do compilador, recebe ponteiro de caractere que corresponde aos dados a serem analisado, um inteiro len que representa o tamanho do array, a lista de nos l, e a linha atual em formato inteiro
 Lista* analise_lexica(char *iParse, int len, Lista* l, int line){
     char* parse = new char[len+1]; // Allocate memory dynamically
-    strcpy(parse, iParse);
+    strcpy(parse, iParse); // copia os caracteres de iparse para parse
     l = separateAndAnalyze(parse, l, line);
     delete[] parse;  // Free the allocated memory
     return l;
@@ -292,6 +296,7 @@ Lista* analise_lexica(char *iParse, int len, Lista* l, int line){
 //     return l;
 // }
 
+// funcao principal da analise lexical, que separa os tokens e analisa eles, recebe o caractere correspondente atual a ser analisado,
 Lista* separateAndAnalyze(char *parse, Lista* l, int line){
     int left, right, len, buffer=0,temPontoEVirgula=0;
     char linha[100];
@@ -311,13 +316,13 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
 
             if (isDelimiter(token[right]) == true && left == right) {
                 if (isOperator(token[right]) == true){
-                    cout << token[right] << " IS AN OPERATOR" << endl; //
+                    cout << token[right] << " IS AN OPERATOR" << endl; // printa a detecção de operadores
                     char tokenCH[2];tokenCH[0]=token[right];tokenCH[1]='\0';
                     l = lst_insere(l, tokenCH, 1, line);
                 }
                 else if(isDelimiterChar(token[right]) == true){
                     if(token[right]==';') //
-                        cout << token[right] << endl<<endl<<endl; //
+                        cout << token[right] << endl<<endl<<endl; // printa algo q n sei ainda
                     char tokenCH[2];tokenCH[0]=token[right];tokenCH[1]='\0';
                     l = lst_insere(l, tokenCH, 6, line);
                 }
@@ -332,15 +337,15 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
             else if (isDelimiter(token[right]) == true && left != right || (right == len && left != right)) {
                 char* subStr = subString(token, left, right - 1);
                 if (isKeyword(subStr) == true){
-                    cout << subStr<< " IS A KEYWORD" << endl; //
+                    cout << subStr<< " IS A KEYWORD" << endl; //printa a analise de keywords
                     l = lst_insere(l, subStr, 2, line);
                 }
                 else if (AutomatoInteger(subStr) == true){
-                    cout << subStr << " IS AN INTEGER" << endl; //
+                    cout << subStr << " IS AN INTEGER" << endl; // printa a analise de integers
                     l = lst_insere(l, subStr, 3, line);
                 }
                 else if (AutomatoFloat(subStr) == true){
-                    cout << subStr << " IS A float NUMBER" << endl; //
+                    cout << subStr << " IS A FLOAT NUMBER" << endl; // printa a analise de floats
                     l = lst_insere(l, subStr, 4, line);
                 }
                 else if (AutomatoIdentifier(subStr) == true && isDelimiter(token[right - 1]) == false){
@@ -352,8 +357,10 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
                         strcat(erroMsg, str);
                         strcat(erroMsg, " ");
                         strcat(erroMsg, subStr);
-                        strcat(erroMsg, " eh muito grande este compilador nao esta apto a lidar com indentificadores maiores do que 1 caractere");
+                        strcat(erroMsg, " eh muito grande este compilador nao esta apto a lidar com identificadores maiores do que 1 caractere");
                         error=1;
+                        cout << erroMsg << endl; //pra verificar se ta ok o arquivo
+                        //exit(2); // erro de analise lexica
                         break;
                     }
                     cout << subStr << " IS A VALID IDENTIFIER" << endl; //
@@ -385,7 +392,7 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
     return l;
 }
 
-// Extracts the SUBSTRING.
+// extrai a substring, recebe um ponteiro de caractere, int correspondente à esq, int correspondente à dir
 char* subString(char* str, int left, int right) {
     int i;
     char *subStr = (char*)malloc(sizeof(char) * (right - left + 2));
@@ -1000,12 +1007,12 @@ void simplifica_arvore_fraca(Arv* arv, Arv* arv2, ArvS* arvS, ArvS* arvS2){
 void arv_imprime_no(Nodo* raiz);
 
 //This function prints a tree. It calls the arv_imprime_no function to print the root node of the tree.
-void arv_imprime(Arv* arv){ 
+void arv_imprime(Arv* arv){
     return arv_imprime_no(arv->raiz);
 }
 
 //This function prints a node of a tree in a recursive manner. If the node is not NULL and its information is not '&', it first prints the node's information, then recursively prints the left, center, and right children of the node.
-void arv_imprime_no(Nodo* raiz){ 
+void arv_imprime_no(Nodo* raiz){
 	printf("<");
 	if(raiz!=NULL && raiz->info[0]!='&'){
         printf("%s",raiz->info);
@@ -1096,6 +1103,8 @@ int AutomatoM(char *str, char *str2, int line){
         strcat(erroMsg, temp);
         strcat(erroMsg, " esperava )");
         error=2;
+        //cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+
     }
     else if(parentese<0){
         char temp[10];
@@ -1105,6 +1114,7 @@ int AutomatoM(char *str, char *str2, int line){
         strcat(erroMsg, temp);
         strcat(erroMsg, " esperava (");
         error=2;
+        //cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
     }
 
     int k,QProd;
@@ -1290,9 +1300,10 @@ int erroSyntax=0;
 
 stack<char>pilha_atribuicao;
 
-void analise_sintatica(Lista* l){ //era uma int function
+/* legenda: 1- Operador, 2- Keyword, 3- Integer, 4- float, 5- Identifier, 6- delimiter, 7- finalDelimeter,8- InvalidIdentifier*/
+void analise_sintatica(Lista* l){
     Lista* p;
-    p=l;
+    p=l;   // p recebe a lista 
     q1=quadrupla_cria();
     char atribuicao[2];
     int useExp=0,declaracao=0;
@@ -1300,12 +1311,12 @@ void analise_sintatica(Lista* l){ //era uma int function
         char exp[40];exp[0]='\0';
         char exp2[40];exp2[0]='\0';
         while(p->token[0]!=';' && p!=NULL){
-            if(p->cod==2 && p->prox->cod==5 && p->prox->prox->cod==7){
+            if(p->cod==2 && p->prox->cod==5 && p->prox->prox->cod==7){ //identifica 1 sentenca de declaracao de identificador
                 declaracao=1;
                 p=p->prox->prox;
                 break;
             }
-            else if((p->cod==3 || p->cod==4 || p->cod==5 || p->token[0]==')') && p->prox!=NULL){
+            else if((p->cod==3 || p->cod==4 || p->cod==5 || p->token[0]==')') && p->prox!=NULL){ // identifica se atual p é integer, float, identificador, ou ) e se o proximo p não é nulo
                 if(p->prox->cod!=1 && p->prox->token[0]!=')' && p->prox->cod!=7){
                     char temp[10];
                     sprintf(temp, "%d", p->line+2);
@@ -1315,7 +1326,8 @@ void analise_sintatica(Lista* l){ //era uma int function
                     strcat(erroMsg, " falta ; antes de ");
                     strcat(erroMsg, p->prox->token);
                     error=1;
-                    break;
+                    cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+                    exit(3); //erro de sintaxe
                 }
                 else if(p->cod==5 && p->prox->cod==7)
                     useExp=1;
@@ -1352,7 +1364,7 @@ void analise_sintatica(Lista* l){ //era uma int function
                 char topo_pilha[1];
                 char topo_pilha_exp[1];
                 int vAmount=0;
-                while(!pilha_arvore.empty()){ //pilha_arvare_exp tem o mesmo tamnho que pilha_arvore
+                while(!pilha_arvore.empty()){ //pilha_arvare_exp tem o mesmo tamanho que pilha_arvore
                     topo_pilha_exp[0]=pilha_arvore_exp.top();topo_pilha_exp[1]='\0';
                     topo_pilha[0]=pilha_arvore.top();topo_pilha[1]='\0';
                     inserir_arv(arv1, arvExp1, topo_pilha, topo_pilha_exp);
@@ -1376,6 +1388,7 @@ void analise_sintatica(Lista* l){ //era uma int function
                     strcat(erroMsg, "Linha: ");
                     strcat(erroMsg, temp);
                     strcat(erroMsg, " erro de syntax");
+                    //cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
                 }
                 break;
             }
@@ -1389,11 +1402,14 @@ void analise_sintatica(Lista* l){ //era uma int function
     if(error==0){
         q2=quadrupla_cria();
         q2=quadrupla_cpy_inver(q2,q1);
+        //cout << "a quadrupla gerada do arquivo analisado pela analise sintatica eh:" << endl;
         quadrupla_imprime(q2);
         cout << endl;
         imprime_cod_itermediario(q2);
+        //cout << "o codigo intermediario gerado do arquivo analisado pela analise sintatica eh:" << endl;
         otimiza_cod_intermediario(q2);
         cout << endl;
+        //cout << "e seu codigo otimizado eh:" << endl;
         imprime_cod_itermediario_otimizado(q2);
     }
     quadrupla_libera(q1);
@@ -1447,6 +1463,7 @@ void checa_var_declara(Lista* l){
                 strcat(erroMsg, p->token);
                 strcat(erroMsg, " nao foi declarado neste escopo");
                 error=1;
+                //cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
                 break;
             }
         }
@@ -1717,6 +1734,7 @@ void gera_mips(char *var){
         fprintf(p, line);
 
         fclose(p);
+        cout << "codigo mips eviado ao arquivo" << endl;
     }
 }
 
@@ -1788,12 +1806,6 @@ void gera_mips2(Quadrupla *q){
     }
 }
 
-//interface
-#include <fstream>
-#include <iostream>
-#include <vector>
-#include <string>
-
 
 // This function reads from a file and returns its content as a string.
 std::string readFile(const std::string& filename) {
@@ -1854,25 +1866,28 @@ void espaco(){
 void visualiza_lista(Lista* lista){
     Lista* temp = lista;
     if(temp != NULL) {
-        cout << "The list contains: ";
+        cout << "A atual lista contem: " << std::endl << std::endl;
         while(temp != NULL) {
             cout << temp->token << " ";
+            cout << temp->cod << " ";
+            cout << temp->line << endl;
             temp = temp->prox;
         }
         cout << endl;
     } else {
-        cout << "The list is empty.\n";
+        cout << "A lista esta vazia.\n";
     }
 }
 
 void compilar(std::string fileContent){
-    int MainWindow, edit;
+    int edit;
+
     string quadrupla;
-    char* quadruplaCharArr = nullptr;                                                       // Initialize to nullptr
-    string cod_inter = nullptr;                                                             // Initialize to nullptr
-    char* cod_intermediario_arr = nullptr;                                                  // Initialize to nullptr
-    char* cod_intermediario_otimi_arr = nullptr;                                            // Initialize to nullptr
+    char* quadruplaCharArr = nullptr;                                                           // Initialize to nullptr
+    string cod_inter;                                                                           
+    char* cod_intermediario_arr = nullptr;                                                      // Initialize to nullptr
     string cod_intermediario_otimi;
+    char* cod_intermediario_otimi_arr = nullptr;                                                // Initialize to nullptr
     Lista* l;
     l=lst_cria();
 
@@ -1881,20 +1896,27 @@ void compilar(std::string fileContent){
     fprintf(p,".data\n\n");
     fclose(p);
 
-    int _size = fileContent.length();  
+    int _size = fileContent.length();
     char *data = new char[_size+1];
     fileContent.copy(data, _size);
     data[_size] = '\0';
+
+
+    espaco();
+    // std::cout << "quantidade de caracteres" << std::endl;
+    // std::cout << _size;                                                                  //verificar se ta funcionando a importação dos dados de entrada
     // espaco();
-    // std::cout << _size;                                                                  //verificar se ta funcionando a importação dos dados do arquivo
-    // espaco();
-    // std::cout << data << std::endl;                                                      // Print the file content on the screen
-    
-    /////////////// fase de analise lexica //////////////////
+    // std::cout << "print dos dados recebidos por data" << std::endl;
+    // std::cout << data << std::endl;                                                      //printar os dados recebidos(TA OK)
+
+    /////////////////// fase de analise lexica //////////////////////
+
     char exp[100];
     int i=0,i2=0,numLinha=0;
+    
+    cout << "\t\t**********inicializando fase de analise lexica dos dados providos**********" << std::endl << std::endl;
     while(i<_size){
-        exp[i2]=data[i];
+        exp[i2]=data[i];  //recebe os dados obtidos de fileContent
         i++;
         i2++;
         if(data[i-1]==';'){
@@ -1907,10 +1929,11 @@ void compilar(std::string fileContent){
             numLinha++;
             //std::cout << numLinha <<std::endl;                                            //visualiza a contagem de linhas
     }
+    // cout << std::endl << "visualizacao dos dados de l: token codigo linha." << std::endl;
+    // visualiza_lista(l);
 
-
-    // for(int j=0; j<_size; j++){                                                          //visualiza a separacao os tokens
-    //     std::cout << data[j] << std::endl; 
+    // for(int j=0; j<_size; j++){                                                          //visualiza a separacao dos tokens
+    //     std::cout << data[j] << std::endl;
     // }
 
 
@@ -1920,25 +1943,33 @@ void compilar(std::string fileContent){
     Lista* l2;
     l2=lst_cria();
     espaco();
-    visualiza_lista(l2);
-    cout << "lista vazia criada";
+    cout << "\t\t**********Inicio da fase de analise sintatica dos dados providos**********";
     espaco();
+    // visualiza_lista(l2);  // para visualizar l2 que esta atualmente vazia
     if(error==0){
-        l2=lst_cpy_inver(l,l2);
-        visualiza_lista(l2);
-        cout << "lista preenchida de forma invertida";
-        // l2=lst_cpy_inver(l2,l); //original
+        cout << "se nenhum erro for detectado pela analise lexica entao o compilador executa a analise sintatica" << endl << endl;
+        l2=lst_cpy_inver(l2,l); //original
+        // cout << "lista preenchida de forma invertida antes de passar pela analise sintatica" << endl;
         // visualiza_lista(l2);
-        // cout << "lista preenchida de forma invertida original";
-        espaco();
+        // espaco();
         analise_sintatica(l2);
-    }
-    // visualiza_lista(l2);                                                                 //visualiza lista preenchida
-    // cout << "lista preenchida";
+    cout << "passou da analise sintatica" << std::endl;
+    } 
+     
+    // cout << "ao final da analise sintatica temos a da quadrupla, e do código intermediario" << std::endl;
+    cout << cod_inter << "1"<< endl;                                                                 //visualiza lista preenchida
+    cout << cod_intermediario_arr << "2"<< endl;                                                                 //visualiza lista preenchida
+    cout << cod_intermediario_otimi << "3"<< endl;                                                                 //visualiza lista preenchida
+    cout << cod_intermediario_otimi_arr << "4"<< endl;                                                                 //visualiza lista preenchida
+    cout << cod_intermediario_otimiSTR << "5"<< endl;                                                                 //visualiza lista preenchida
+    cout << cod_intermediarioSTR << "6"<< endl;                                                                 //visualiza lista preenchida
     lst_libera(l);
 
 
     ///////////////// fase de analise semantica //////////////////
+    espaco();
+    cout << "inicio da analise semantica";
+    espaco();
     if(error==0){
         var_declara=lst_cria();
         var_declara=lst_cpy_var(var_declara,l2);
@@ -1946,41 +1977,13 @@ void compilar(std::string fileContent){
         lst_libera(var_declara);
         if(error==1) quadrupla_libera(q2);
     }
-
-    
     ///////////////// fase de geração de código //////////////////
-//     if(error==0){
-//         gera_mips2(q2);
-//         int i=0;
-//         char quadruplaCharArr[quadruplaSTR.length()];
-//         while(i<quadruplaSTR.length()){
-//             quadruplaCharArr[i]=quadruplaSTR[i];
-//             i++;
-//         }
-//         quadruplaCharArr[i]='\0';
-//         SetWindowText(hQuadrupla,quadruplaCharArr);
-//         i=0;
-//         char cod_intermediario_arr[cod_intermediarioSTR.length()];
-//         while(i<cod_intermediarioSTR.length()){
-//             cod_intermediario_arr[i]=cod_intermediarioSTR[i];
-//             i++;
-//         }
-//         cod_intermediario_arr[i]='\0';
-//         SetWindowText(hCod_inter, cod_intermediario_arr);
-//         i=0;
-//         char cod_intermediario_otimi_arr[cod_intermediario_otimiSTR.length()];
-//         while(i<cod_intermediario_otimiSTR.length()){
-//             cod_intermediario_otimi_arr[i]=cod_intermediario_otimiSTR[i];
-//             i++;
-//         }
-//         cod_intermediario_otimi_arr[i]='\0';
-//         SetWindowText(hCod_inter_otimi, cod_intermediario_otimi_arr);
-//         quadrupla_libera(q2);
-//     }
+
     lst_libera(l2);
     if(error == 0){
         gera_mips2(q2);
-        int i = 0;  
+        //cout << "teste pra saber se chegou aqui" << endl;
+        int i = 0;
         quadruplaCharArr = new char[quadruplaSTR.length() + 1];                             // Allocate memory
         while(i < quadruplaSTR.length() + 1){
             quadruplaCharArr[i]=quadruplaSTR[i];
@@ -1989,20 +1992,21 @@ void compilar(std::string fileContent){
         quadruplaCharArr[i]='\0';
         std::cout << quadruplaCharArr;
     }
-    quadrupla = quadruplaCharArr;                                                           // tem que verificar se ta funcionando!!
+    quadrupla = quadruplaCharArr;
+    cout << quadrupla << std::endl; //testando                                                          
 
     i=0;
     cod_inter = cod_intermediario_arr;                                                      // tem q verificar se ta funcionando!!
-    cod_intermediario_arr = new char[cod_intermediarioSTR.length() + 1];                    // Allocate memory 
+    cod_intermediario_arr = new char[cod_intermediarioSTR.length() + 1];                    // Allocate memory
     while(i<cod_intermediarioSTR.length()+ 1){                                              // tem q verificar se ta funcionando!!
-        cod_intermediario_arr[i]=cod_intermediarioSTR[i]; 
+        cod_intermediario_arr[i]=cod_intermediarioSTR[i];
         i++;
     }
     cod_intermediario_arr[i]='\0';
     cod_inter = cod_intermediario_arr;                                                      // tem que verificar se ta funcionando!!
     i=0;
 
-    cod_intermediario_otimi_arr = new char[cod_intermediario_otimiSTR.length() + 1];        // Allocate memory 
+    cod_intermediario_otimi_arr = new char[cod_intermediario_otimiSTR.length() + 1];        // Allocate memory
     while(i<cod_intermediario_otimiSTR.length() + 1){
         cod_intermediario_otimi_arr[i]=cod_intermediario_otimiSTR[i];
         i++;
@@ -2010,7 +2014,7 @@ void compilar(std::string fileContent){
     cod_intermediario_otimi_arr[i]='\0';
     cod_intermediario_otimi = cod_intermediario_otimi_arr;                                  // tem que verificar se ta funcionando!!
     quadrupla_libera(q2);
-        
+
     if(error==1 || error==2){
         error=0;
         char text[201];
@@ -2080,8 +2084,7 @@ int main() {
                 case 1: {
                         //std::cout << fileContent << std::endl;                            // Print the file content on the screen
                         espaco();
-                        std::cout << "comecando agora a compilacao do arquivo";
-                        espaco();
+                        std::cout << "comecando a compilacao do arquivo";
                         compilar(fileContent);
                         return 0;
                     }

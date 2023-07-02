@@ -1,2 +1,6 @@
 .data
 
+t: .word
+
+main:
+

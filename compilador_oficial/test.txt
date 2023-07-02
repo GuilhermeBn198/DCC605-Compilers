@@ -1,3 +1,2 @@
 float t;
-int y;
-y+6;
+int y
