@@ -14,6 +14,15 @@ professor Luciano*/
 
 using namespace std;
 
+int edit;
+
+string quadrupla;
+char* quadruplaCharArr = nullptr;                                                           // Initialize to nullptr
+string cod_inter;                                                                           
+char* cod_intermediario_arr = nullptr;                                                      // Initialize to nullptr
+string cod_intermediario_otimi;
+char* cod_intermediario_otimi_arr = nullptr;                                                // Initialize to nullptr
+
 char erroMsg[200];
 int  error=0;
 
@@ -1317,35 +1326,37 @@ void analise_sintatica(Lista* l){
                 break;
             }
             else if((p->cod==3 || p->cod==4 || p->cod==5 || p->token[0]==')') && p->prox!=NULL){ // identifica se atual p é integer, float, identificador, ou ) e se o proximo p não é nulo
-                if(p->prox->cod!=1 && p->prox->token[0]!=')' && p->prox->cod!=7){
+                if(p->prox->cod!=1 && p->prox->token[0]!=')' && p->prox->cod!=7){ // o codigo do proximo p nao ser operador, o token dele for ) e o codigo nao for de delimitador final, entao eh um erro sintatico dos dados 
                     char temp[10];
                     sprintf(temp, "%d", p->line+2);
-                    strcpy(erroMsg, "erro Sintatico\n");
-                    strcat(erroMsg, "Linha: ");
+                    strcpy(erroMsg, "\n\n\t\t********erro sintatico detectado**********\n");
+                    strcat(erroMsg, "\tLinha: ");
                     strcat(erroMsg, temp);
-                    strcat(erroMsg, " falta ; antes de ");
+                    strcat(erroMsg, "\tfalta ; antes de ");
                     strcat(erroMsg, p->prox->token);
                     error=1;
-                    std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
-                    exit(3); //erro de sintaxe
+                    std::cout << erroMsg << endl;// printa o erro
+                    exit(3); //erro de sintaxe 
                 }
-                else if(p->cod==5 && p->prox->cod==7)
+                else if(p->cod==5 && p->prox->cod==7) //se o p atual for identificador e o proximo um delimitador final(;) ele assume que é um inicio de uma expressao matematica
                     useExp=1;
             }
-            if(p->prox->token[0]=='='){
+            if(p->prox->token[0]=='='){ //detecta o operador de atribuicao e coloca a variavel na pilha de atribuicao 
                 pilha_atribuicao.push(p->token[0]);
             }
             if(useExp==0 && p->prox->token[0]=='+' || p->prox->token[0]=='-' || p->prox->token[0]=='*' ||
-                    p->prox->token[0]=='/' || p->token[0]=='(' || p->token[0]==')'){
+                    p->prox->token[0]=='/' || p->token[0]=='(' || p->token[0]==')'){ //verifica se ainda não foi detectado que eh uma expressao, se o proximo token eh um sinal matematico ou se nao eh ( ), se passar por tudo isso, o compilador assume que eh uma expressao matematica
                 useExp=1;
             }
-            if(useExp){
+            if(useExp){ //se useExp for true, inicia a fase de detecao da operacao matematica
                 if(p->token[0]=='+' || p->token[0]=='-' || p->token[0]=='*' || p->token[0]=='/' ||
-                   p->token[0]=='(' || p->token[0]==')')
-                    strcat(exp2,p->token);
-                else if(p->cod==3 || p->cod==4 || p->cod==5)
-                    strcat(exp2,"v");
+                   p->token[0]=='(' || p->token[0]==')') {
+                        strcat(exp2,p->token);
+                    }
+                else if(p->cod==3 || p->cod==4 || p->cod==5) strcat(exp2,"v");
+                
                 strcat(exp,p->token);
+                std::cout << exp << std::endl; // mostra a atribuicao de operacao matematica ocorrendo
             }
             else if(p->token[0]=='='){
                 pilha_atribuicao.push(p->token[0]);
@@ -1880,14 +1891,6 @@ void visualiza_lista(Lista* lista){
 }
 
 void compilar(std::string fileContent){
-    int edit;
-
-    string quadrupla;
-    char* quadruplaCharArr = nullptr;                                                           // Initialize to nullptr
-    string cod_inter;                                                                           
-    char* cod_intermediario_arr = nullptr;                                                      // Initialize to nullptr
-    string cod_intermediario_otimi;
-    char* cod_intermediario_otimi_arr = nullptr;                                                // Initialize to nullptr
     Lista* l;
     l=lst_cria();
 
@@ -1927,7 +1930,7 @@ void compilar(std::string fileContent){
         }
         if(data[i]=='\n')
             numLinha++;
-            //std::cout << numLinha <<std::endl;                                            //visualiza a contagem de linhas
+            // std::cout << numLinha <<std::endl;                                            //visualiza a contagem de linhas
     }
     // std::cout << "visualizacao dos dados de l: token codigo linha." << std::endl;
     // visualiza_lista(l);
@@ -1957,26 +1960,28 @@ void compilar(std::string fileContent){
     } 
      
     // std::cout << "ao final da analise sintatica temos a da quadrupla, e do código intermediario" << std::endl;
-    std::cout << cod_inter << "1"<< endl;                                                                 //visualiza lista preenchida
-    std::cout << cod_intermediario_arr << "2"<< endl;                                                                 //visualiza lista preenchida
-    std::cout << cod_intermediario_otimi << "3"<< endl;                                                                 //visualiza lista preenchida
-    std::cout << cod_intermediario_otimi_arr << "4"<< endl;                                                                 //visualiza lista preenchida
-    std::cout << cod_intermediario_otimiSTR << "5"<< endl;                                                                 //visualiza lista preenchida
-    std::cout << cod_intermediarioSTR << "6"<< endl;                                                                 //visualiza lista preenchida
+    // std::cout << cod_inter << "1"<< endl;                                                                 //visualiza lista preenchida
+    // std::cout << cod_intermediario_arr << "2"<< endl;                                                                 //visualiza lista preenchida
+    // std::cout << cod_intermediario_otimi << "3"<< endl;                                                                 //visualiza lista preenchida
+    // std::cout << cod_intermediario_otimi_arr << "4"<< endl;                                                                 //visualiza lista preenchida
+    // std::cout << cod_intermediario_otimiSTR << "5"<< endl;                                                                 //visualiza lista preenchida
+    // std::cout << cod_intermediarioSTR << "6"<< endl;                                                                 //visualiza lista preenchida
     lst_libera(l);
 
 
     ///////////////// fase de analise semantica //////////////////
     espaco();
-    std::cout << "inicio da analise semantica" << std::endl;
+    std::cout << "\t\t**********Inicio da analise semantica**********" << std::endl;
     espaco();
     if(error==0){
         var_declara=lst_cria();
         var_declara=lst_cpy_var(var_declara,l2);
+
         checa_var_declara(l2);
         lst_libera(var_declara);
         if(error==1) quadrupla_libera(q2);
     }
+
     ///////////////// fase de geração de código //////////////////
 
     lst_libera(l2);

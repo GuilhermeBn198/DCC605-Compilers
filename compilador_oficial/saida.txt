@@ -1,7 +1,2 @@
 .data
 
-t: .word
-y: .word
-
-main:
-
