@@ -26,6 +26,23 @@ char* cod_intermediario_otimi_arr = nullptr;                                    
 char erroMsg[200];
 int  error=0;
 
+void printCharArray(char arr[], int size) {
+    for(int i = 0; i < size; i++) {
+        std::cout << arr[i];
+    }
+    std::cout << '\n';
+}
+
+void printStack(std::stack<char> s) {
+    while (!s.empty()) {
+        std::cout << ' ' << s.top();
+        s.pop();
+    }
+    std::cout << '\n';
+}
+void espaco(){
+    std::cout << endl << std::flush;
+}
 //************************analise lexica****************************
 
 /* legenda: 1- Operador, 2- Keyword, 3- Integer, 4- float, 5- Identifier, 6- delimiter, 7- finalDelimeter,8- InvalidIdentifier*/
@@ -38,7 +55,22 @@ typedef struct lista{
     int line;
 }Lista;
 
-
+//serve para visualizar uma lista ligada
+void visualiza_lista(Lista* lista){
+    Lista* temp = lista;
+    if(temp != NULL) {
+        std::cout << "A atual lista contem: " << std::endl << std::endl;
+        while(temp != NULL) {
+            std::cout << temp->token << " " << std::flush;
+            std::cout << temp->cod << " " << std::flush;
+            std::cout << temp->line << endl;
+            temp = temp->prox;
+        }
+        std::cout << endl;
+    } else {
+        std::cout << "A lista esta vazia." << endl;
+    }
+}
 //Esta função é usada para criar uma nova lista. Ele retorna NULL que representa uma lista vazia neste contexto.
 Lista* lst_cria(void){
     return NULL;
@@ -106,7 +138,9 @@ int AutomatoInteger (char *str){
     //inicial 0, final 2
     int i;
     /* Declarando a matriz de estados do automato M */
-    int M[3][3]={{1, -1, -1},{1, -1, -1},{2, 2, 2}};
+    int M[3][3]={{ 1, -1, -1},
+                 { 1, -1, -1},
+                 { 2,  2,  2}};
 
     /* Definindo o estado inicial */
     int e = 0;
@@ -150,7 +184,10 @@ int AutomatoFloat (char *str){
     //inicial 0, final 4
     int i;
     /* Declarando a matriz de estados do automato M */
-    int M[4][5]={{1, -1, -1, -1, -1}, {1, -1, -1, -1, -1}, {2, 2, 2, 4, 4}, {-1, -1, 3, -1, -1}};
+    int M[4][5]={{ 1, -1, -1, -1, -1}, 
+                 { 1, -1, -1, -1, -1}, 
+                 { 2,  2,  2,  4,  4}, 
+                 {-1, -1,  3, -1, -1}};
 
     /* Definindo o estado inicial */
     int e = 0;
@@ -436,6 +473,7 @@ typedef struct noS{
     struct noS *dir;
 }NodoS;
 
+
 typedef struct quadrupla{
     char op[1];
     char arg1[10];
@@ -444,6 +482,19 @@ typedef struct quadrupla{
     struct quadrupla* prox;
 }Quadrupla;
 
+void imprimeQuadruplas(Quadrupla* q) {
+    Quadrupla* atual = q;
+
+    while (atual != NULL) {
+        printf("op: %s\n", atual->op);
+        printf("arg1: %s\n", atual->arg1);
+        printf("arg2: %s\n", atual->arg2);
+        printf("result: %s\n", atual->result);
+        printf("\n");
+
+        atual = atual->prox;
+    }
+}
 typedef struct arv{
     Nodo *raiz;
 }Arv;
@@ -452,13 +503,14 @@ typedef struct arvS{
     NodoS *raiz;
 }ArvS;
 
+//cria uma arvore com os valores nulos contendo arv->raiz = null
 Arv* arv_cria(void){
     Arv* arv = (Arv*)malloc(sizeof(Arv));
     arv->raiz = NULL;
     return arv;
 }
 
-
+//cria uma arvore com os valores nulos contendo arv->raiz = null
 ArvS* arv_criaS(void){
     ArvS* arvS = (ArvS*)malloc(sizeof(ArvS));
     arvS->raiz = NULL;
@@ -1070,15 +1122,30 @@ void liberar_avr_noS(NodoS* raiz){
     }
 }
 
+// recebe um array de caracteres, o primeiro com a operacoes o segundo com as variaveis 
 int AutomatoM(char *str, char *str2, int line){
     /* concatenando o simbolo delimitador na sentenca */
     strcat(str,"$");
     strcat(str2,"$");
+    // std::cout << "concatenacao das strings" << std::endl;
+    // printCharArray(str, sizeof(str));
+    // printCharArray(str2, sizeof(str2));
 
     /* Declarando a tabela sintatica para o automato M */
-    char M[13][8]={{'D', '\0', '\0', '\0', '\0', 'D', '\0', '\0'}, {'R', 'D', '\0', '\0', '\0', 'R', '\0', 'R'}, {'R', 'R', 'D', '\0', '\0', 'R', '\0', 'R'}, {'R', 'R', 'R', 'D', '\0', 'R', '\0', 'R'}, {'R', 'R', 'R', 'R', '\0', 'R', '\0', 'R'},
-                    {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'},
-                    {'R', 'R', 'R', 'R', '\0', 'R', '\0', 'R'}, {'R', 'R', 'R', 'R', '\0', 'R', '\0', 'R'}, {'\0', '\0', '\0', '\0', 'D', '\0', 'D', '\0'}};
+    char M[13][8]={ { 'D', '\0', '\0', '\0', '\0',  'D', '\0', '\0'}, 
+                    { 'R',  'D', '\0', '\0', '\0',  'R', '\0',  'R'}, 
+                    { 'R',  'R',  'D', '\0', '\0',  'R', '\0',  'R'}, 
+                    { 'R',  'R',  'R',  'D', '\0',  'R', '\0',  'R'}, 
+                    { 'R',  'R',  'R',  'R', '\0',  'R', '\0',  'R'},
+                    {'\0', '\0', '\0', '\0',  'D', '\0',  'D', '\0'}, 
+                    {'\0', '\0', '\0', '\0',  'D', '\0',  'D', '\0'}, 
+                    {'\0', '\0', '\0', '\0',  'D', '\0',  'D', '\0'}, 
+                    {'\0', '\0', '\0', '\0',  'D', '\0',  'D', '\0'}, 
+                    {'\0', '\0', '\0', '\0',  'D', '\0',  'D', '\0'},
+                    { 'R',  'R',  'R',  'R', '\0',  'R', '\0',  'R'}, 
+                    { 'R',  'R',  'R',  'R', '\0',  'R', '\0',  'R'}, 
+                    {'\0', '\0', '\0', '\0',  'D', '\0',  'D', '\0'}
+                    };
 
     const int QLinhasProducoes = 10;
     char producoes[QLinhasProducoes][6]={{"E;E+S"},{"E;S"},{"S;S-M"},{"S;M"},{"M;M*D"},{"M;D"},{"D;D/P"},{"D;P"},{"P;(E)"},{"P;v"}};
@@ -1089,7 +1156,6 @@ int AutomatoM(char *str, char *str2, int line){
 
     /* Colocando o simbolo delimitador na pilha*/
     pilha.push('$');
-
     /* Recebe a indexacao referente ao matriz*/
     int c,l,i;
     /* Recebe as producoes*/
@@ -1097,12 +1163,14 @@ int AutomatoM(char *str, char *str2, int line){
 
     int parentese=0;
     i=0;
+    // std::cout << "print do contador de parenteses" << std::endl;
     while(str[i]!='$'){
         if(str[i]=='(')
             parentese++;
         else if(str[i]==')')
             parentese--;
         i++;
+        // std::cout << parentese << std::endl;
     }
     if(parentese>0){
         char temp[10];
@@ -1112,8 +1180,8 @@ int AutomatoM(char *str, char *str2, int line){
         strcat(erroMsg, temp);
         strcat(erroMsg, " esperava )");
         error=2;
-        std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
-
+        std::cout << erroMsg << endl; // printa durante o debug do compilador
+        //exit(3);
     }
     else if(parentese<0){
         char temp[10];
@@ -1123,13 +1191,15 @@ int AutomatoM(char *str, char *str2, int line){
         strcat(erroMsg, temp);
         strcat(erroMsg, " esperava (");
         error=2;
-        std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+        std::cout << erroMsg << endl; // printa durante o debug do compilador
+        //exit(3);
     }
 
     int k,QProd;
     /* Percorrendo toda a sentenca de avaliacao*/
     i=0;
     while(str[i]!='\0' && error==0){
+        // std::cout << str[i] << endl; 
         switch(str[i]){
             case '+':
                 c=0;
@@ -1208,7 +1278,7 @@ int AutomatoM(char *str, char *str2, int line){
 
             char Nprod = M[l][c];  //l = topo da stack, c = caractere atual do input string
             int producoes_compativeis[2];
-
+            printCharArray(str, sizeof(str));
             /* Fazendo equivalencia entre a producao e ordem inversa e o seu numero da tabela */
             switch(Nprod){
                 case 'D':
@@ -1336,7 +1406,7 @@ void analise_sintatica(Lista* l){
                     strcat(erroMsg, p->prox->token);
                     error=1;
                     std::cout << erroMsg << endl;// printa o erro
-                    exit(3); //erro de sintaxe 
+                    //exit(3); //erro de sintaxe 
                 }
                 else if(p->cod==5 && p->prox->cod==7) //se o p atual for identificador e o proximo um delimitador final(;) ele assume que é um inicio de uma expressao matematica
                     useExp=1;
@@ -1348,25 +1418,29 @@ void analise_sintatica(Lista* l){
                     p->prox->token[0]=='/' || p->token[0]=='(' || p->token[0]==')'){ //verifica se ainda não foi detectado que eh uma expressao, se o proximo token eh um sinal matematico ou se nao eh ( ), se passar por tudo isso, o compilador assume que eh uma expressao matematica
                 useExp=1;
             }
-            if(useExp){ //se useExp for true, inicia a fase de detecao da operacao matematica
+            if(useExp){ //se useExp for true, inicia a fase de deteccao da operacao matematica
                 if(p->token[0]=='+' || p->token[0]=='-' || p->token[0]=='*' || p->token[0]=='/' ||
                    p->token[0]=='(' || p->token[0]==')') {
                         strcat(exp2,p->token);
                     }
                 else if(p->cod==3 || p->cod==4 || p->cod==5) strcat(exp2,"v");
-                
                 strcat(exp,p->token);
-                std::cout << exp << std::endl; // mostra a atribuicao de operacao matematica ocorrendo
+                // std::cout << exp << std::endl; // mostra a atribuicao de operacao matematica ocorrendo
+                // std::cout << "comeca aqui o token"<< std::endl;
+                // std:cout << p->token << "   " << p->cod << std::endl;
             }
             else if(p->token[0]=='='){
                 pilha_atribuicao.push(p->token[0]);
                 useExp=1;
             }
+            // std::cout << "dentro do while" << std::endl;
+            // std::cout << p->token << std::endl; // visualiza o no atual
             p=p->prox;
         }
         if(declaracao==0 && error==0){
             exp[strlen(exp)]='\0';
             int res = AutomatoM(exp2, exp, p->line);
+             std::cout << res << std::endl;
             if(res==1){
                 Arv* arv1 = arv_cria();
                 Arv* arvExp1 = arv_cria();
@@ -1406,6 +1480,8 @@ void analise_sintatica(Lista* l){
             else
                 break;
         }
+        // std::cout << declaracao << std::endl; //
+        // std::cout << error << std::endl;      //
         declaracao=0;
         useExp=0;
         p=p->prox;
@@ -1414,7 +1490,7 @@ void analise_sintatica(Lista* l){
         q2=quadrupla_cria();
         q2=quadrupla_cpy_inver(q2,q1);
         std::cout << "a quadrupla gerada do arquivo analisado pela analise sintatica eh:" << endl;
-        quadrupla_imprime(q2);
+        //quadrupla_imprime(q1);
         std::cout << endl;
         imprime_cod_itermediario(q2);
         //std::cout << "o codigo intermediario gerado do arquivo analisado pela analise sintatica eh:" << endl;
@@ -1474,7 +1550,7 @@ void checa_var_declara(Lista* l){
                 strcat(erroMsg, p->token);
                 strcat(erroMsg, " nao foi declarado neste escopo");
                 error=1;
-                //std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
+                std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
                 break;
             }
         }
@@ -1487,12 +1563,12 @@ void checa_var_declara(Lista* l){
 //************************Geracao do codigo ******************************
 string quadruplaSTR;
 
-
+// cria uma quadrupla com todos os valores vazios char op[1]; char arg1[10]; char arg2[10]; char result[10]; struct quadrupla* prox;
 Quadrupla* quadrupla_cria(void){
     return NULL;
 }
 
-Quadrupla* quadrupla_insere(Quadrupla* q, char op[], char arg1[], char arg2[], char result[]){
+Quadrupla* quadrupla_insere(Quadrupla* q, const char op[], const char arg1[], const char arg2[], const char result[]){
     Quadrupla* linha = (Quadrupla*)malloc(sizeof(Quadrupla));
     linha->op[0]=op[0];linha->op[1]='\0';
     strcpy(linha->arg1,arg1);
@@ -1597,6 +1673,7 @@ string cod_intermediarioSTR;
 void imprime_cod_itermediario(Quadrupla* q){
     Quadrupla *p;
     p=q;
+    quadrupla_imprime(p);
     cod_intermediarioSTR="";
     char tempOp[1];
     while(p!=NULL){
@@ -1745,7 +1822,7 @@ void gera_mips(char *var){
         fprintf(p, line);
 
         fclose(p);
-        std::cout << "codigo mips eviado ao arquivo" << endl;
+        //std::cout << "codigo mips eviado ao arquivo" << endl;
     }
 }
 
@@ -1869,26 +1946,8 @@ void save_file(const std::string& data){
     file.close();
 }
 
-void espaco(){
-    std::cout << endl << std::flush;
-}
 
-// serve para visualizar uma lista ligada
-void visualiza_lista(Lista* lista){
-    Lista* temp = lista;
-    if(temp != NULL) {
-        std::cout << "A atual lista contem: " << std::endl << std::endl;
-        while(temp != NULL) {
-            std::cout << temp->token << " " << std::flush;
-            std::cout << temp->cod << " " << std::flush;
-            std::cout << temp->line << endl;
-            temp = temp->prox;
-        }
-        std::cout << endl;
-    } else {
-        std::cout << "A lista esta vazia." << endl;
-    }
-}
+// 
 
 void compilar(std::string fileContent){
     Lista* l;
@@ -1910,13 +1969,16 @@ void compilar(std::string fileContent){
     // std::cout <<  _size  << endl;                                                                  //verificar se ta funcionando a importação dos dados de entrada
     // espaco();
     // std::cout << "print dos dados recebidos por data" << std::endl;
-    // std::cout << data << std::endl;                                                      //printar os dados recebidos(TA OK)
+    // std::cout << data << std::endl;                                                                   //printar os dados recebidos(TA OK)
 
     /////////////////// fase de analise lexica //////////////////////
 
     char exp[100];
     int i=0,i2=0,numLinha=0;
-    
+    espaco();
+    espaco();
+    espaco();
+    espaco();
     std::cout << "\t\t**********inicializando fase de analise lexica dos dados providos**********" << std::endl << std::endl;
     while(i<_size){
         exp[i2]=data[i];  //recebe os dados obtidos de fileContent
@@ -1976,8 +2038,8 @@ void compilar(std::string fileContent){
     if(error==0){
         var_declara=lst_cria();
         var_declara=lst_cpy_var(var_declara,l2);
-
         checa_var_declara(l2);
+        //visualiza_lista(var_declara);
         lst_libera(var_declara);
         if(error==1) quadrupla_libera(q2);
     }
@@ -1985,25 +2047,30 @@ void compilar(std::string fileContent){
     ///////////////// fase de geração de código //////////////////
 
     lst_libera(l2);
+    std::cout << "\t\t**********Inicio da geracao de codigo**********" << std::endl;
+
     if(error == 0){
+        std::cout << "teste pra saber se chegou aqui" << endl;
         gera_mips2(q2);
-        //std::cout << "teste pra saber se chegou aqui" << endl;
+        imprimeQuadruplas(q2);
         int i = 0;
-        quadruplaCharArr = new char[quadruplaSTR.length() + 1];                             // Allocate memory
-        while(i < quadruplaSTR.length() + 1){
+        //std::cout << quadruplaSTR.length() << endl;
+        //std::cout << quadruplaSTR <<endl;
+        quadruplaCharArr = new char[quadruplaSTR.length()];                             // Allocate memory
+        while(i < quadruplaSTR.length()){
             quadruplaCharArr[i]=quadruplaSTR[i];
+            //std::cout << quadruplaCharArr[i]  << std::flush;
             i++;
         }
         quadruplaCharArr[i]='\0';
-        std::cout << quadruplaCharArr  << std::flush;
     }
     quadrupla = quadruplaCharArr;
-    std::cout << quadrupla << std::endl; //testando                                                          
+    // std::cout << quadrupla << std::endl; //testando                                                          
 
     i=0;
     cod_inter = cod_intermediario_arr;                                                      // tem q verificar se ta funcionando!!
-    cod_intermediario_arr = new char[cod_intermediarioSTR.length() + 1];                    // Allocate memory
-    while(i<cod_intermediarioSTR.length()+ 1){                                              // tem q verificar se ta funcionando!!
+    cod_intermediario_arr = new char[cod_intermediarioSTR.length()];                    // Allocate memory
+    while(i<cod_intermediarioSTR.length()){                                              // tem q verificar se ta funcionando!!
         cod_intermediario_arr[i]=cod_intermediarioSTR[i];
         i++;
     }
@@ -2011,8 +2078,8 @@ void compilar(std::string fileContent){
     cod_inter = cod_intermediario_arr;                                                      // tem que verificar se ta funcionando!!
     i=0;
 
-    cod_intermediario_otimi_arr = new char[cod_intermediario_otimiSTR.length() + 1];        // Allocate memory
-    while(i<cod_intermediario_otimiSTR.length() + 1){
+    cod_intermediario_otimi_arr = new char[cod_intermediario_otimiSTR.length()];        // Allocate memory
+    while(i<cod_intermediario_otimiSTR.length()){
         cod_intermediario_otimi_arr[i]=cod_intermediario_otimiSTR[i];
         i++;
     }

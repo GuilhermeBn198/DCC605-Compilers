@@ -1,2 +1,7 @@
 .data
 
+y: .word
+x: .word
+
+main:
+
