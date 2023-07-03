@@ -1,2 +1,12 @@
 .data
 
+a: .word
+b: .word
+c: .word
+
+main:
+
+lw b,1
+lw c,2
+sub $t1,b,c
+lw a,$t1
