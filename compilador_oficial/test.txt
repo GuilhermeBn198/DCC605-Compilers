@@ -1,2 +1,6 @@
-float y;
-int x;
+int a;
+int b;
+int c;
+b = 1;
+c = 2;
+a = b + c;

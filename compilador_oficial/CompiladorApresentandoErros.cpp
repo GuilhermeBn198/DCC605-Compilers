@@ -406,7 +406,7 @@ Lista* separateAndAnalyze(char *parse, Lista* l, int line){
                         strcat(erroMsg, " eh muito grande este compilador nao esta apto a lidar com identificadores maiores do que 1 caractere");
                         error=1;
                         std::cout << erroMsg << endl; //pra verificar se ta ok o arquivo
-                        //exit(2); // erro de analise lexica
+                        exit(2); // erro de analise lexica
                         break;
                     }
                     std::cout << subStr << " IS A VALID IDENTIFIER" << endl; //
@@ -1181,7 +1181,7 @@ int AutomatoM(char *str, char *str2, int line){
         strcat(erroMsg, " esperava )");
         error=2;
         std::cout << erroMsg << endl; // printa durante o debug do compilador
-        //exit(3);
+        exit(3);
     }
     else if(parentese<0){
         char temp[10];
@@ -1192,7 +1192,7 @@ int AutomatoM(char *str, char *str2, int line){
         strcat(erroMsg, " esperava (");
         error=2;
         std::cout << erroMsg << endl; // printa durante o debug do compilador
-        //exit(3);
+        exit(3);
     }
 
     int k,QProd;
@@ -1406,7 +1406,7 @@ void analise_sintatica(Lista* l){
                     strcat(erroMsg, p->prox->token);
                     error=1;
                     std::cout << erroMsg << endl;// printa o erro
-                    //exit(3); //erro de sintaxe 
+                    exit(3); //erro de sintaxe 
                 }
                 else if(p->cod==5 && p->prox->cod==7) //se o p atual for identificador e o proximo um delimitador final(;) ele assume que é um inicio de uma expressao matematica
                     useExp=1;
@@ -1440,7 +1440,7 @@ void analise_sintatica(Lista* l){
         if(declaracao==0 && error==0){
             exp[strlen(exp)]='\0';
             int res = AutomatoM(exp2, exp, p->line);
-             std::cout << res << std::endl;
+            //std::cout << res << std::endl;
             if(res==1){
                 Arv* arv1 = arv_cria();
                 Arv* arvExp1 = arv_cria();
@@ -1452,6 +1452,7 @@ void analise_sintatica(Lista* l){
                 while(!pilha_arvore.empty()){ //pilha_arvare_exp tem o mesmo tamanho que pilha_arvore
                     topo_pilha_exp[0]=pilha_arvore_exp.top();topo_pilha_exp[1]='\0';
                     topo_pilha[0]=pilha_arvore.top();topo_pilha[1]='\0';
+                    printStack(pilha_arvore);  
                     inserir_arv(arv1, arvExp1, topo_pilha, topo_pilha_exp);
                     if(pilha_arvore.top()=='v')
                         vAmount++;
@@ -1472,7 +1473,7 @@ void analise_sintatica(Lista* l){
                     strcpy(erroMsg, "erro Sintatico\n");
                     strcat(erroMsg, "Linha: ");
                     strcat(erroMsg, temp);
-                    strcat(erroMsg, " erro de syntax");
+                    strcat(erroMsg, " erro de syntaxe");
                     std::cout << erroMsg << endl; // printa durante o debug do compilador(lembrar de tirar depois!!!!!!!!)
                 }
                 break;
