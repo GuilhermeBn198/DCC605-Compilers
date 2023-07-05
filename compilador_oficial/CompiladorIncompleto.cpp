@@ -1841,9 +1841,9 @@ void gera_mips2(Quadrupla *q){
         while(g!=NULL){
             if(g->op[0]=='+' || g->op[0]=='-'){
                 if(g->op[0]=='-')
-                    strcpy(line, "add ");
-                else
                     strcpy(line, "sub ");
+                else
+                    strcpy(line, "add ");
                 if(g->result[0]=='_')
                     g->result[0]='$';
                 strcat(line, g->result);
